@@ -106,6 +106,10 @@ html, body {
   vector-effect: non-scaling-stroke;
 }
 
+#map .base path { stroke-width: 1.2px; vector-effect: none; }
+#map .base .base-context { fill: var(--land-context); stroke: var(--land-context); }
+#map .base .base-playable { fill: var(--land); stroke: var(--land); }
+
 #map .context path { fill: var(--land-context); }
 #map .playable path { fill: var(--land); transition: fill 0.25s; }
 

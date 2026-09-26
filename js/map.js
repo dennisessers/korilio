@@ -11,12 +11,19 @@ export function createMap(svg, data) {
   const [vx, vy, vw, vh] = data.viewBox.split(' ').map(Number);
 
   svg.append(el('rect', { class: 'sea', x: vx, y: vy, width: vw, height: vh }));
+  // Neighbouring shapes in the source data don't quite touch; a thick same-colour
+  // underlay closes the slivers of sea that would otherwise show between them.
+  const baseLayer = el('g', { class: 'base' });
   const contextLayer = el('g', { class: 'context' });
   const playLayer = el('g', { class: 'playable' });
   const markerLayer = el('g', { class: 'markers' });
-  svg.append(contextLayer, playLayer, markerLayer);
+  svg.append(baseLayer, contextLayer, playLayer, markerLayer);
 
-  for (const c of data.context) contextLayer.append(el('path', { d: c.d }));
+  for (const c of data.context) {
+    baseLayer.append(el('path', { d: c.d, class: 'base-context' }));
+    contextLayer.append(el('path', { d: c.d }));
+  }
+  for (const c of data.playable) baseLayer.append(el('path', { d: c.d, class: 'base-playable' }));
 
   const paths = new Map();
   for (const c of data.playable) {
