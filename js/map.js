@@ -32,6 +32,8 @@ export function createMap(svg, data) {
     markerLayer.replaceChildren();
   }
 
+  let tinyTarget = null;
+
   function highlight(country) {
     clear();
     const p = paths.get(country.code);
@@ -40,11 +42,24 @@ export function createMap(svg, data) {
     markerLayer.append(
       el('circle', { class: 'ring', cx: country.cx, cy: country.cy, r: ringRadius }),
     );
+    const box = p.getBBox();
+    // Countries like Luxembourg are only a few pixels wide; mark them with a dot.
+    tinyTarget = Math.max(box.width, box.height) < ringRadius * 0.4 ? country : null;
+    if (tinyTarget) {
+      markerLayer.append(
+        el('circle', { class: 'dot', cx: country.cx, cy: country.cy, r: ringRadius * 0.3 }),
+      );
+    }
   }
 
   function markCorrect(code) {
     paths.get(code).setAttribute('class', 'correct');
     markerLayer.replaceChildren();
+    if (tinyTarget?.code === code) {
+      markerLayer.append(
+        el('circle', { class: 'dot correct', cx: tinyTarget.cx, cy: tinyTarget.cy, r: ringRadius * 0.3 }),
+      );
+    }
   }
 
   function flashGuess(code) {

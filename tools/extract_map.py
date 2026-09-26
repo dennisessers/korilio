@@ -17,7 +17,7 @@ PLAYABLE = [
     "GB", "IE", "IS", "NO", "SE", "FI", "DK", "NL", "BE", "FR", "ES", "PT", "DE",
     "CH", "AT", "IT", "PL", "CZ", "HU", "RO", "BG", "GR", "HR", "UA", "RS",
     "EE", "LV", "LT", "SK", "SI", "BA",
-    "AL", "MK", "ME",
+    "AL", "MK", "ME", "MD", "LU",
 ]
 
 # Dutch display names shown in the game (source names are English).
@@ -31,6 +31,7 @@ NAMES = {
     "RS": "Servië", "EE": "Estland", "LV": "Letland", "LT": "Litouwen",
     "SK": "Slowakije", "SI": "Slovenië", "BA": "Bosnië en Herzegovina",
     "AL": "Albanië", "MK": "Noord-Macedonië", "ME": "Montenegro",
+    "MD": "Moldavië", "LU": "Luxemburg",
 }
 
 # Map-coordinate frame (source space is 900 x ~441) used to drop far-away
