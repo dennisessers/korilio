@@ -17,8 +17,11 @@ PLAYABLE = [
     "GB", "IE", "IS", "NO", "SE", "FI", "DK", "NL", "BE", "FR", "ES", "PT", "DE",
     "CH", "AT", "IT", "PL", "CZ", "HU", "RO", "BG", "GR", "HR", "UA", "RS",
     "EE", "LV", "LT", "SK", "SI", "BA",
-    "AL", "MK", "ME", "MD", "LU",
+    "AL", "MK", "ME", "MD", "LU", "XK",
 ]
+
+# The source uses placeholder keys (_0, _1, ...) for some territories.
+CODE_BY_NAME = {"Kosovo": "XK", "N. Cyprus": "CY-N", "Somaliland": "SO-S"}
 
 # Dutch display names shown in the game (source names are English).
 NAMES = {
@@ -31,7 +34,7 @@ NAMES = {
     "RS": "Servië", "EE": "Estland", "LV": "Letland", "LT": "Litouwen",
     "SK": "Slowakije", "SI": "Slovenië", "BA": "Bosnië en Herzegovina",
     "AL": "Albanië", "MK": "Noord-Macedonië", "ME": "Montenegro",
-    "MD": "Moldavië", "LU": "Luxemburg",
+    "MD": "Moldavië", "LU": "Luxemburg", "XK": "Kosovo",
 }
 
 # Map-coordinate frame (source space is 900 x ~441) used to drop far-away
@@ -45,8 +48,11 @@ def load_source():
     if not SOURCE.exists():
         urllib.request.urlretrieve(SOURCE_URL, SOURCE)
     text = SOURCE.read_text(encoding="utf-8")
-    pattern = re.compile(r'"?([A-Z]{2}|[A-Z_-]+)"?:\{path:"([^"]+)",name:"([^"]+)"\}')
-    return {code: {"d": d, "name": name} for code, d, name in pattern.findall(text)}
+    pattern = re.compile(r'"?([A-Z]{2}|_\d+)"?:\{path:"([^"]+)",name:"([^"]+)"\}')
+    return {
+        CODE_BY_NAME.get(name, code): {"d": d, "name": name}
+        for code, d, name in pattern.findall(text)
+    }
 
 
 def parse_subpaths(d):
