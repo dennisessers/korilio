@@ -68,10 +68,11 @@ export function createUI() {
 let audioCtx = null;
 const SOUND_KEY = 'korilio.sound';
 
-// Crowd cheers by Gregor Quendel (CC BY 4.0), trimmed; see THIRD_PARTY_NOTICES.md.
+// Applause by Sandermotions (CC0), trimmed; see THIRD_PARTY_NOTICES.md.
+const APPLAUSE_URL = 'sounds/applause.wav';
 const CLIPS = {
-  correct: { url: 'sounds/cheer.mp3', seconds: 2.6 },
-  finish: { url: 'sounds/cheer-big.mp3', seconds: 6 },
+  correct: { seconds: 2.2, volume: 0.6 },
+  finish: { seconds: 5.5, volume: 0.9 },
 };
 
 function readSoundPref() {
@@ -85,13 +86,10 @@ function readSoundPref() {
 export function createSound(toggleBtn) {
   let enabled = readSoundPref();
   let playing = null;
-  const raw = {};
-  const decoded = {};
-  for (const [kind, clip] of Object.entries(CLIPS)) {
-    raw[kind] = fetch(clip.url).then((r) => r.arrayBuffer()).catch(() => null);
-  }
+  const raw = fetch(APPLAUSE_URL).then((r) => r.arrayBuffer()).catch(() => null);
+  let decoded = null;
 
-  function stopCheer() {
+  function stopApplause() {
     try {
       playing?.stop();
     } catch {}
@@ -105,7 +103,7 @@ export function createSound(toggleBtn) {
 
   toggleBtn.addEventListener('click', () => {
     enabled = !enabled;
-    if (!enabled) stopCheer();
+    if (!enabled) stopApplause();
     try {
       localStorage.setItem(SOUND_KEY, enabled ? 'on' : 'off');
     } catch {}
@@ -113,11 +111,11 @@ export function createSound(toggleBtn) {
   });
   render();
 
-  function load(kind) {
-    decoded[kind] ??= raw[kind]
+  function load() {
+    decoded ??= raw
       .then((buf) => buf && new Promise((ok, fail) => audioCtx.decodeAudioData(buf, ok, fail)))
       .catch(() => null);
-    return decoded[kind];
+    return decoded;
   }
 
   function unlock() {
@@ -125,23 +123,24 @@ export function createSound(toggleBtn) {
       const Ctx = window.AudioContext || window.webkitAudioContext;
       if (!Ctx) return;
       audioCtx = new Ctx();
-      for (const kind of Object.keys(CLIPS)) load(kind);
+      load();
     }
     if (audioCtx.state === 'suspended') audioCtx.resume();
   }
 
-  async function cheer(kind) {
-    const buffer = await load(kind);
+  async function applause(kind) {
+    const buffer = await load();
     if (!buffer || !enabled) return;
-    stopCheer();
+    stopApplause();
     const src = audioCtx.createBufferSource();
     const g = audioCtx.createGain();
     src.buffer = buffer;
     const t = audioCtx.currentTime;
-    const len = Math.min(CLIPS[kind].seconds, buffer.duration);
+    const { seconds, volume } = CLIPS[kind];
+    const len = Math.min(seconds, buffer.duration);
     g.gain.setValueAtTime(0, t);
-    g.gain.linearRampToValueAtTime(0.9, t + 0.05);
-    g.gain.setValueAtTime(0.9, t + len - 0.7);
+    g.gain.linearRampToValueAtTime(volume, t + 0.05);
+    g.gain.setValueAtTime(volume, t + len - 0.7);
     g.gain.linearRampToValueAtTime(0, t + len);
     src.connect(g).connect(audioCtx.destination);
     src.start(t);
@@ -166,7 +165,7 @@ export function createSound(toggleBtn) {
   function play(kind) {
     if (!enabled || !audioCtx) return;
     if (kind === 'wrong') tone(220, 0.25, 0.12);
-    else cheer(kind);
+    else applause(kind);
   }
 
   return { unlock, play };

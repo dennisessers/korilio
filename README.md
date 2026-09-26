@@ -9,7 +9,7 @@ A geography game for kids, entirely in Dutch. A country lights up on the map of 
 - All 34 countries come up once, in random order, before the game ends.
 - A wrong answer greys out that button and marks where the guessed country really is on the map. The player then simply tries again, and there is no timer.
 - ⭐ counts countries found on the first try. 🔥 shows a streak of 3 or more.
-- A correct answer gets a crowd cheer, and finishing the game gets a bigger one. 🔊/🔇 turns the sound on or off. The setting is remembered. The iPad's silent switch also mutes it.
+- A correct answer gets a short, soft applause, and finishing the game gets a longer one. 🔊/🔇 turns the sound on or off. The setting is remembered. The iPad's silent switch also mutes it.
 
 ## Run locally
 
@@ -45,4 +45,4 @@ This rewrites `data/europe.js`, including the map frame (viewBox). The script us
 
 ## Credits
 
-Map shapes come from [jsvectormap](https://github.com/themustafaomar/jsvectormap), © 2020 Mustafa Omar, MIT License. Cheering sounds are by Gregor Quendel, CC BY 4.0. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+Map shapes come from [jsvectormap](https://github.com/themustafaomar/jsvectormap), © 2020 Mustafa Omar, MIT License. The applause is by Sandermotions (CC0). See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).

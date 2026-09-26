@@ -35,10 +35,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
-## Crowd cheering sounds
+## Applause sound
 
-`sounds/cheer.mp3` and `sounds/cheer-big.mp3` are trimmed excerpts (about 3 s and 6 s) of
-"04 - Strong cheering - II - Short" and "03 - Strong cheering - I" from
-[Free Crowd Cheering Sounds](https://opengameart.org/content/free-crowd-cheering-sounds)
-by **Gregor Quendel**, licensed under
-[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). The game fades them in and out when playing.
+`sounds/applause.wav` is a trimmed (5.5 s), mono, 24 kHz version of
+[277021 sandermotions applause-2.wav](https://commons.wikimedia.org/wiki/File:277021_sandermotions_applause-2.wav)
+by **Sandermotions**, released under [CC0](https://creativecommons.org/publicdomain/zero/1.0/) (no attribution required).
