@@ -4,6 +4,8 @@ A geography game for kids, entirely in Dutch. A country lights up on the map of 
 
 **Play:** https://dennisessers.github.io/korilio/ (works on iPad in Safari; use *Share → Add to Home Screen* to run it full-screen)
 
+Full project documentation (history, architecture, how to add countries, workflow): see [PROJECT.md](PROJECT.md).
+
 ## How it plays
 
 - All 37 countries come up once, in random order, before the game ends.
