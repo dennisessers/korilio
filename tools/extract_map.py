@@ -16,7 +16,7 @@ OUT = ROOT / "data" / "europe.js"
 PLAYABLE = [
     "GB", "IE", "IS", "NO", "SE", "FI", "DK", "NL", "BE", "FR", "ES", "PT", "DE",
     "CH", "AT", "IT", "PL", "CZ", "HU", "RO", "BG", "GR", "HR", "UA", "RS",
-    "EE", "LV", "LT",
+    "EE", "LV", "LT", "SK", "SI", "BA",
 ]
 
 # Dutch display names shown in the game (source names are English).
@@ -28,6 +28,7 @@ NAMES = {
     "PL": "Polen", "CZ": "Tsjechië", "HU": "Hongarije", "RO": "Roemenië",
     "BG": "Bulgarije", "GR": "Griekenland", "HR": "Kroatië", "UA": "Oekraïne",
     "RS": "Servië", "EE": "Estland", "LV": "Letland", "LT": "Litouwen",
+    "SK": "Slowakije", "SI": "Slovenië", "BA": "Bosnië en Herzegovina",
 }
 
 # Map-coordinate frame (source space is 900 x ~441) used to drop far-away

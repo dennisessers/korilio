@@ -6,7 +6,7 @@ A geography game for kids, entirely in Dutch. A country lights up on the map of 
 
 ## How it plays
 
-- All 28 countries come up once, in random order, before the game ends.
+- All 31 countries come up once, in random order, before the game ends.
 - A wrong answer greys out that button and marks where the guessed country really is on the map. The player then simply tries again, and there is no timer.
 - ⭐ counts countries found on the first try. 🔥 shows a streak of 3 or more.
 - A correct answer gets a crowd cheer, and finishing the game gets a bigger one. 🔊/🔇 turns the sound on or off. The setting is remembered. The iPad's silent switch also mutes it.
