@@ -10,9 +10,32 @@ Everything is in Dutch, built for touch on an iPad, with no timer and no penalti
 - **Code:** https://github.com/dennisessers/korilio (public, because GitHub Pages needs that)
 - **Idea:** @DennisEssers. Built with Claude Code.
 
-## Status (2026-09-26)
+## State of affairs (2026-09-26)
 
-Live with two modules (Kaart and Vlaggen) and an opening menu: 37 European countries, Dutch text, an applause sound, and it works on iPad in both orientations. There's no build step: pushing to `main` updates the live site within about a minute.
+**Live and working** at https://dennisessers.github.io/korilio/, with everything committed and pushed in both repos (`korilio` and the umbrella `claude_tryouts`).
+
+**What's there:**
+- An opening menu, "Kies een spel" (choose a game), with two cards: **Kaart** and **Vlaggen**.
+- **Kaart:** 37 countries light up on the map. The kid picks the Dutch name from 4 buttons.
+- **Vlaggen:** the flag of the same 37 countries, with the same 4-button question.
+- **Shared by both:**
+  - Dutch text, no timer; after a wrong answer the kid just tries again.
+  - Score ⭐ and streak 🔥; an end screen with 1–3 stars, "Nog een keer" (play again) and "Menu".
+  - A soft applause for a correct answer (can be muted, and the setting is remembered).
+  - 🏠 back to the menu; navigation through the URL hash (`#kaart`, `#vlaggen`).
+  - Works on iPad in portrait and landscape.
+- There's no build step: pushing to `main` updates the live site within about a minute.
+
+**Tested:**
+- In Chrome, both modules have been played through from start to finish.
+- The layout was checked in landscape and at iPad-portrait size (768×1024).
+- The user plays the map game on a real iPad.
+
+**Not done yet / open:**
+- The **flag game hasn't been checked on a real iPad yet** (tested in Chrome only).
+- **Git layout:** KORILIO's git data still sits in `KORILIO/.git` instead of `.git/modules/` (see *Repo and git workflow*). It works; tidying it is optional.
+- **URL capitals:** the URL is case-sensitive; a redirect for `/KORILIO/` was offered but not built.
+- **Difficulty levels, hints, reverse mode:** not built (see *Ideas for later*).
 
 ### How we got here
 
@@ -30,6 +53,7 @@ Live with two modules (Kaart and Vlaggen) and an opening menu: 37 European count
 | `9b58ee5` | "Idee: @DennisEssers" added to the footer |
 | `cc2b7f4` | This PROJECT.md |
 | `3b62af0` | Second module **Vlaggen** plus an opening menu with the choice "Kaart" / "Vlaggen", hash navigation, 🏠 button, "Menu" on the end screen |
+| `ac64e41` + this commit | PROJECT.md brought up to date with the current state |
 
 ## Repo and git workflow
 
@@ -53,19 +77,20 @@ Live with two modules (Kaart and Vlaggen) and an opening menu: 37 European count
 | `js/ui.js` | `createUI()` (buttons, prompt, progress, end screen, `hideSummary`) and `createSound()` (applause, a soft tone for a wrong answer, `stop()`) |
 | `data/europe.js` | **Generated.** `{ viewBox, playable:[{code,name,d,cx,cy}], context:[{code,d}] }` |
 | `tools/extract_map.py` | Generates `data/europe.js` from `tools/world.js` and downloads any missing `flags/<code>.svg`. Python standard library only |
-| `flags/<code>.svg` | 4×3 flags from flag-icons (commit `086f7e9`), lowercase ISO codes (`xk` = Kosovo) |
+| `flags/<code>.svg` | 4×3 flags from flag-icons (commit `086f7e9`), lowercase ISO codes (`xk` = Kosovo). 37 files, 383 KB in total; Servië (181 KB), Spanje (81 KB) and Montenegro (56 KB) are the big ones because of their detailed coats of arms |
 | `tools/FLAG_ICONS_LICENSE` | MIT licence of flag-icons |
 | `tools/world.js` | Pinned copy of jsvectormap's `world.js` (commit `08283f0`) |
 | `tools/JSVECTORMAP_LICENSE` | MIT licence of jsvectormap |
 | `sounds/applause.wav` | Applause, 5.5 s, mono, 24 kHz (~260 KB) |
 | `README.md` | Short public description |
+| `.nojekyll`, `.gitignore`, `.gitattributes` | GitHub Pages without Jekyll; ignores `__pycache__` and OS clutter; LF line endings in the repo |
 | `THIRD_PARTY_NOTICES.md` | Licences and sources of the map data, flags and sound |
 
 ## How it works
 
 ### Screens and navigation (`js/main.js`)
 
-- `body[data-screen]` is `menu`, `kaart` or `vlaggen`. The CSS hides what isn't needed:
+- `body[data-screen]` is `menu`, `kaart` or `vlaggen`. The HTML starts as `menu`, so nothing flashes on load. The CSS hides what isn't needed:
   - on the menu: `.stage` and the `.game-only` elements (🏠 and progress);
   - in a game: `.menu` and the other game's picture (`.map-wrap` or `.flag-wrap`).
 - **URL hash is the source of truth:** `route()` runs on load and on every `hashchange`.
@@ -76,12 +101,16 @@ Live with two modules (Kaart and Vlaggen) and an opening menu: 37 European count
   - **Kaart:** `map.highlight` / `map.flashGuess` / `map.markCorrect`.
   - **Vlaggen:** `flagView.show`, nothing extra on a wrong answer (the button still greys out), and a green frame on a correct one.
   - Adding a third module means one more entry in `MODES`, a menu card, and a hide rule in the CSS.
-- **Audio unlock:** tapping a menu card calls `sound.unlock()`, so on iOS the applause works from the very first answer.
+- **Audio unlock:** tapping a menu card calls `sound.unlock()`, so on iOS the applause works from the very first answer. If a game is opened directly via a link (without the menu), the first answer tap unlocks the audio instead.
+- **Menu pictures:**
+  - The Kaart card is a second `createMap(...)` drawn into `<svg id="menu-map">` (non-interactive, `preserveAspectRatio="xMidYMid slice"`).
+  - The Vlaggen card is a 2×2 grid of `<img>` elements (NL, BE, FR, DE).
+  - Landscape: the cards sit side by side. Portrait: stacked, with 16:9 pictures.
 
 ### Flags (`js/flags.js`)
 
 - `flags/<code>.svg`, a 4:3 flag in `.flag-frame`. The frame is sized with container-query units (`min(100cqw, 133.33cqh)`), so it's always as large as possible without distortion.
-- `preloadAll` loads all 37 flags as soon as the flag game starts, so there's no flicker between rounds.
+- `preloadAll` loads all 37 flags (383 KB) as soon as the flag game starts, so there's no flicker between rounds.
 - The `alt` text is deliberately generic ("Vlag van een Europees land"), so it doesn't give the answer away.
 - The menu pictures have `pointer-events: none`. Otherwise a tap on the picture would count as dragging an image, and the button wouldn't respond.
 
@@ -89,10 +118,11 @@ Live with two modules (Kaart and Vlaggen) and an opening menu: 37 European count
 
 - **Order:** at the start, all countries are shuffled into a queue (Fisher–Yates). Each country comes up exactly once per game.
 - **Choices:** each round has the correct country plus 3 random other countries (`pickDistractors`, mode `'random'`). A `'near'` mode already exists that picks neighbouring countries; it's meant for a harder level later.
-- **Wrong answer:** the button greys out and the child tries again. The game never subtracts points.
+- **Wrong answer:** the button greys out, the prompt says "Bijna! Probeer het nog eens!" and the child tries again. In the Kaart game, the guessed country also flashes purple on the map for a moment. The game never subtracts points.
 - **Score:** ⭐ counts countries answered correctly on the first try. 🔥 appears for a streak of 3 or more.
-- **End screen:** 1–3 stars (90% or more = 3, 60% or more = 2) and a "Nog een keer" (play again) button.
-- **Future settings:** `DEFAULT_SETTINGS` (`choices`, `timerSeconds`, `hints`, `distractorMode`) is ready for difficulty levels, but v1 always uses the defaults.
+- **Correct answer:** the button turns green, the prompt says e.g. "Knap gedaan! Dat is Albanië!", the applause plays, and the next round starts after 1.4 s (`ADVANCE_MS` in `main.js`).
+- **End screen:** 1–3 stars (90% or more = 3, 60% or more = 2), the number correct on the first try, the longest streak (if 3 or more), and the buttons "Nog een keer" (same module again) and "Menu".
+- **Future settings:** `DEFAULT_SETTINGS` (`choices`, `timerSeconds`, `hints`, `distractorMode`) is ready for difficulty levels, but both modules currently use the defaults.
 
 ### Map (`js/map.js` + CSS)
 
@@ -113,12 +143,16 @@ Borders are white 1px lines with `vector-effect: non-scaling-stroke`, so they lo
 - No page scrolling (`100dvh`, `overflow: hidden`).
 - Buttons are at least 76px tall.
 - Hover styles only apply in `@media (hover: hover)`.
-- Layout: side by side in landscape (at least 700px wide), map on top with a 2×2 button grid in portrait.
+- **Layout:**
+  - Landscape (at least 700px wide): the picture (map or flag) on the left, the 4 buttons in one column on the right.
+  - Portrait: the picture on top, a 2×2 button grid below.
+- **Pictures inside buttons** (the menu cards) have `pointer-events: none`, so a tap never gets caught as an image drag.
 - `apple-mobile-web-app-capable`, so "Zet op beginscherm" (Add to Home Screen) opens the game full-screen.
 
 ### Sound (`js/ui.js` → `createSound`)
 
-- iOS only allows audio after a tap, so the `AudioContext` is created on the first tap (`unlock()`). The WAV file is fetched when the page loads and decoded at that first tap.
+- iOS only allows audio after a tap, so the `AudioContext` is created on the first tap (`unlock()`, called on a menu tap and on every answer). The WAV file is fetched when the page loads and decoded at that first tap.
+- `stop()` cuts off the applause when leaving a game.
 - **Correct answer:** the first 2.2 s of the applause at volume 0.6. **End of game:** the full 5.5 s at volume 0.9. Both fade in and out.
 - **Wrong answer:** a soft low triangle-wave tone (Web Audio, no file).
 - The 🔊/🔇 setting is saved in `localStorage` under `korilio.sound`. The iPad's silent switch also mutes the game.
@@ -181,7 +215,8 @@ Then open http://localhost:8765. ES modules don't work over `file://`, so double
 ## Ideas for later
 
 - **Difficulty levels:** "near" distractors (neighbouring countries), more choices, an optional timer. The `DEFAULT_SETTINGS` in `game.js` are ready for this.
-- **Hints:** first letter, flag, or reading the name aloud (Web Speech API, Dutch voice) for children who can't read yet.
+- **Hints:** first letter, the flag as a hint in the Kaart game (the files are already there), or reading the name aloud (Web Speech API, Dutch voice) for children who can't read yet.
+- **Smaller flags:** optimise the big SVGs (Servië, Spanje, Montenegro) with e.g. SVGO if loading on a slow connection becomes a problem.
 - **Reverse mode:** show a name and the child taps the country on the map (a new entry in `MODES`).
 - **Flag game, harder:** choose distractors with similar-looking flags (e.g. NL/LU, RO/MD, IE/IT).
 - **More regions / the whole world:** give `extract_map.py` a different `PLAYABLE` list and `EUROPE_FRAME`, and write it to e.g. `data/world.js`. `main.js` would then choose a region (for example via `?regio=`).
