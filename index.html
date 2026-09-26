@@ -7,30 +7,55 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="KORILIO">
   <meta name="theme-color" content="#bfe3f5">
-  <title>KORILIO – Zoek het land</title>
+  <title>KORILIO – Kaart en vlaggen</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
-<body>
+<body data-screen="menu">
   <div class="app">
     <header class="bar">
+      <button class="icon-btn game-only" id="home" type="button" aria-label="Menu">🏠</button>
       <h1 class="logo">KORILIO</h1>
-      <div class="progress" id="progress" aria-live="polite"></div>
+      <div class="progress game-only" id="progress" aria-live="polite"></div>
       <button class="icon-btn" id="sound-toggle" type="button" aria-label="Geluid aan">🔊</button>
     </header>
 
+    <section class="menu" id="menu">
+      <h2 class="menu-title">Kies een spel</h2>
+      <div class="menu-cards">
+        <button class="menu-card" type="button" data-mode="kaart">
+          <span class="menu-pic">
+            <svg id="menu-map" class="map-svg" aria-hidden="true" preserveAspectRatio="xMidYMid slice"></svg>
+          </span>
+          <span class="menu-label">Kaart</span>
+        </button>
+        <button class="menu-card" type="button" data-mode="vlaggen">
+          <span class="menu-pic menu-flags" aria-hidden="true">
+            <img src="flags/nl.svg" alt=""><img src="flags/be.svg" alt=""><img src="flags/fr.svg" alt=""><img src="flags/de.svg" alt="">
+          </span>
+          <span class="menu-label">Vlaggen</span>
+        </button>
+      </div>
+    </section>
+
     <main class="stage">
-      <div class="map-wrap">
-        <svg id="map" role="img" aria-label="Kaart van Europa waarop één land oplicht"
+      <div class="view map-wrap">
+        <svg id="map" class="map-svg" role="img" aria-label="Kaart van Europa waarop één land oplicht"
              preserveAspectRatio="xMidYMid meet"></svg>
       </div>
 
+      <div class="view flag-wrap">
+        <div class="flag-frame">
+          <img id="flag" alt="Vlag van een Europees land" draggable="false">
+        </div>
+      </div>
+
       <section class="panel">
-        <p class="prompt" id="prompt">Welk land licht op?</p>
+        <p class="prompt" id="prompt"></p>
         <div class="choices" id="choices"></div>
       </section>
     </main>
 
-    <footer class="credit">Idee: <a href="https://x.com/DennisEssers" target="_blank" rel="noopener">@DennisEssers</a> · Kaart: jsvectormap © Mustafa Omar (MIT) · Applaus: Sandermotions (CC0)</footer>
+    <footer class="credit">Idee: <a href="https://x.com/DennisEssers" target="_blank" rel="noopener">@DennisEssers</a> · Kaart: jsvectormap © Mustafa Omar (MIT) · Vlaggen: flag-icons (MIT) · Applaus: Sandermotions (CC0)</footer>
   </div>
 
   <div class="overlay" id="summary" hidden>
@@ -38,7 +63,10 @@
       <div class="stars" id="summary-stars"></div>
       <h2 id="summary-title">Goed gedaan!</h2>
       <p id="summary-text"></p>
-      <button class="big-btn" id="play-again" type="button">Nog een keer</button>
+      <div class="card-buttons">
+        <button class="big-btn" id="play-again" type="button">Nog een keer</button>
+        <button class="big-btn secondary" id="summary-menu" type="button">Menu</button>
+      </div>
     </div>
   </div>
 

@@ -8,7 +8,7 @@ export function createUI() {
   const progressEl = $('progress');
   const buttons = new Map();
 
-  function renderChoices(choices, onPick) {
+  function renderChoices(choices, onPick, prompt) {
     buttons.clear();
     choicesEl.replaceChildren();
     for (const c of choices) {
@@ -20,7 +20,7 @@ export function createUI() {
       buttons.set(c.code, b);
       choicesEl.append(b);
     }
-    promptEl.textContent = 'Welk land licht op?';
+    promptEl.textContent = prompt;
     promptEl.className = 'prompt';
   }
 
@@ -46,7 +46,11 @@ export function createUI() {
     progressEl.textContent = `Land ${Math.min(played + 1, total)} van ${total}   ⭐ ${firstTryCorrect}${fire}`;
   }
 
-  function showSummary({ firstTryCorrect, total, bestStreak }, onPlayAgain) {
+  function hideSummary() {
+    $('summary').hidden = true;
+  }
+
+  function showSummary({ firstTryCorrect, total, bestStreak }, onPlayAgain, onMenu) {
     const ratio = firstTryCorrect / total;
     const stars = ratio >= 0.9 ? 3 : ratio >= 0.6 ? 2 : 1;
     $('summary-stars').textContent = '⭐'.repeat(stars);
@@ -60,9 +64,13 @@ export function createUI() {
       overlay.hidden = true;
       onPlayAgain();
     };
+    $('summary-menu').onclick = () => {
+      overlay.hidden = true;
+      onMenu();
+    };
   }
 
-  return { renderChoices, markWrong, markCorrect, updateProgress, showSummary };
+  return { renderChoices, markWrong, markCorrect, updateProgress, showSummary, hideSummary };
 }
 
 let audioCtx = null;
@@ -168,5 +176,5 @@ export function createSound(toggleBtn) {
     else applause(kind);
   }
 
-  return { unlock, play };
+  return { unlock, play, stop: stopApplause };
 }

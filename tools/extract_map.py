@@ -1,4 +1,5 @@
-"""Build data/europe.js from jsvectormap's world.js (MIT, (c) 2020 Mustafa Omar).
+"""Build data/europe.js from jsvectormap's world.js (MIT, (c) 2020 Mustafa Omar)
+and download any missing flags/<code>.svg from flag-icons (MIT, (c) 2013 Panayiotis Lipiridis).
 
 Usage:  python tools/extract_map.py
 Edit PLAYABLE to change which countries appear in the quiz.
@@ -12,6 +13,8 @@ ROOT = Path(__file__).resolve().parent.parent
 SOURCE = ROOT / "tools" / "world.js"
 SOURCE_URL = "https://raw.githubusercontent.com/themustafaomar/jsvectormap/08283f02227fbf6b63b8da34a43069adfd89bdc7/packages/maps/src/world.js"
 OUT = ROOT / "data" / "europe.js"
+FLAGS_DIR = ROOT / "flags"
+FLAG_URL = "https://raw.githubusercontent.com/lipis/flag-icons/086f7e97d657358203916dbe84f61c2bccaa81eb/flags/4x3/{code}.svg"
 
 PLAYABLE = [
     "GB", "IE", "IS", "NO", "SE", "FI", "DK", "NL", "BE", "FR", "ES", "PT", "DE",
@@ -156,6 +159,18 @@ def main():
     )
     OUT.write_text(header + "export default " + json.dumps(data, separators=(",", ":"), ensure_ascii=False) + ";\n", encoding="utf-8")
     print(f"\nviewBox {data['viewBox']}; {len(playable)} playable, {len(context)} context -> {OUT}")
+    fetch_flags(PLAYABLE)
+
+
+def fetch_flags(codes):
+    FLAGS_DIR.mkdir(exist_ok=True)
+    fetched = 0
+    for code in codes:
+        target = FLAGS_DIR / f"{code.lower()}.svg"
+        if not target.exists():
+            urllib.request.urlretrieve(FLAG_URL.format(code=code.lower()), target)
+            fetched += 1
+    print(f"flags: {len(codes)} needed, {fetched} downloaded -> {FLAGS_DIR}")
 
 
 if __name__ == "__main__":

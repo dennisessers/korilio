@@ -1,14 +1,18 @@
-# KORILIO: map quiz for kids
+# KORILIO: map and flag quiz for kids
 
-A country lights up on a map of Europe, and the child taps its name from four big buttons. The game is entirely in Dutch, is built for touch on an iPad, and has no timer and no penalties.
+A geography game with two modules for the same 37 European countries, chosen on an opening screen:
+- **Kaart** (map): a country lights up on a map of Europe, and the child taps its name from four big buttons.
+- **Vlaggen** (flags): a flag is shown, and the child taps the country name from four big buttons.
 
-- **Play:** https://dennisessers.github.io/korilio/ (lowercase! `/KORILIO/` gives a 404)
+Everything is in Dutch, built for touch on an iPad, with no timer and no penalties.
+
+- **Play:** https://dennisessers.github.io/korilio/ (lowercase! `/KORILIO/` gives a 404). Direct links: `#kaart`, `#vlaggen`
 - **Code:** https://github.com/dennisessers/korilio (public, because GitHub Pages needs that)
 - **Idea:** @DennisEssers. Built with Claude Code.
 
 ## Status (2026-09-26)
 
-v1 is finished and live: 37 European countries, Dutch text, an applause sound, and it works on iPad in both orientations. There's no build step: pushing to `main` updates the live site within about a minute.
+Live with two modules (Kaart and Vlaggen) and an opening menu: 37 European countries, Dutch text, an applause sound, and it works on iPad in both orientations. There's no build step: pushing to `main` updates the live site within about a minute.
 
 ### How we got here
 
@@ -24,6 +28,8 @@ v1 is finished and live: 37 European countries, Dutch text, an applause sound, a
 | `71eb26d` | Kosovo added (the source stored it under the placeholder key `_1`) |
 | `feafb24` | Sea-coloured gaps between neighbouring countries filled (made Kosovo look like a hole) |
 | `9b58ee5` | "Idee: @DennisEssers" added to the footer |
+| `cc2b7f4` | This PROJECT.md |
+| *(commit "Add flag game…")* | Second module **Vlaggen** plus an opening menu with the choice "Kaart" / "Vlaggen", hash navigation, 🏠 button, "Menu" on the end screen |
 
 ## Repo and git workflow
 
@@ -38,21 +44,46 @@ v1 is finished and live: 37 European countries, Dutch text, an applause sound, a
 
 | File | Role |
 |---|---|
-| `index.html` | Page: header (logo, progress, sound button), `<svg id="map">`, prompt, answer buttons, footer credit, end-screen overlay, error box |
-| `css/style.css` | All styling. Colours are variables in `:root`. Touch rules, landscape/portrait layout, map layers, animations |
-| `js/main.js` | Connects everything: builds the map, UI, sound and game. Round flow and double-tap protection (`advancing`) |
+| `index.html` | Page: header (🏠, logo, progress, sound button), opening menu `#menu` (two cards), game area `.stage` with `.map-wrap` (`<svg id="map">`) and `.flag-wrap` (`<img id="flag">`), prompt, answer buttons, footer credit, end-screen overlay (Nog een keer / Menu), error box |
+| `css/style.css` | All styling. Colours are variables in `:root`. Touch rules, landscape/portrait layout, screen switching via `body[data-screen]`, menu, flag frame, map layers (`.map-svg`, shared by the game map and the menu picture), animations |
+| `js/main.js` | Connects everything: `MODES` (kaart/vlaggen), hash routing (`route`, `showMenu`, `startGame`), round flow, double-tap protection and cancelling the pending round (`advanceTimer`) |
 | `js/game.js` | Pure game logic, no DOM: `createGame`, `shuffle`, `pickDistractors`, `DEFAULT_SETTINGS` |
 | `js/map.js` | `createMap(svg, data)` draws the layers and provides `highlight`, `markCorrect`, `flashGuess` and `clear` |
-| `js/ui.js` | `createUI()` (buttons, texts, progress, end screen) and `createSound()` (applause + a soft tone for a wrong answer) |
+| `js/flags.js` | `createFlagView(img)`: `show(country)`, `markCorrect()` (green frame), `preloadAll(countries)`; `flagUrl(code)` |
+| `js/ui.js` | `createUI()` (buttons, prompt, progress, end screen, `hideSummary`) and `createSound()` (applause, a soft tone for a wrong answer, `stop()`) |
 | `data/europe.js` | **Generated.** `{ viewBox, playable:[{code,name,d,cx,cy}], context:[{code,d}] }` |
-| `tools/extract_map.py` | Generates `data/europe.js` from `tools/world.js`. Python standard library only |
+| `tools/extract_map.py` | Generates `data/europe.js` from `tools/world.js` and downloads any missing `flags/<code>.svg`. Python standard library only |
+| `flags/<code>.svg` | 4×3 flags from flag-icons (commit `086f7e9`), lowercase ISO codes (`xk` = Kosovo) |
+| `tools/FLAG_ICONS_LICENSE` | MIT licence of flag-icons |
 | `tools/world.js` | Pinned copy of jsvectormap's `world.js` (commit `08283f0`) |
 | `tools/JSVECTORMAP_LICENSE` | MIT licence of jsvectormap |
 | `sounds/applause.wav` | Applause, 5.5 s, mono, 24 kHz (~260 KB) |
 | `README.md` | Short public description |
-| `THIRD_PARTY_NOTICES.md` | Licences and sources of the map data and the sound |
+| `THIRD_PARTY_NOTICES.md` | Licences and sources of the map data, flags and sound |
 
 ## How it works
+
+### Screens and navigation (`js/main.js`)
+
+- `body[data-screen]` is `menu`, `kaart` or `vlaggen`. The CSS hides what isn't needed:
+  - on the menu: `.stage` and the `.game-only` elements (🏠 and progress);
+  - in a game: `.menu` and the other game's picture (`.map-wrap` or `.flag-wrap`).
+- **URL hash is the source of truth:** `route()` runs on load and on every `hashchange`.
+  - `#kaart` or `#vlaggen` → `startGame(key)`; anything else → `showMenu()`.
+  - The menu cards and 🏠 only change `location.hash`. So the browser back button, the iPad back swipe, refresh and direct links all work.
+- **Leaving or restarting a game** (`stopGame`) clears the pending next-round timer, stops the applause and closes the end screen, so nothing from the old game fires later.
+- **`MODES`** holds, per module: the question (`prompt`) plus `show(country)`, `wrong(code)` and `correct(code)`.
+  - **Kaart:** `map.highlight` / `map.flashGuess` / `map.markCorrect`.
+  - **Vlaggen:** `flagView.show`, nothing extra on a wrong answer (the button still greys out), and a green frame on a correct one.
+  - Adding a third module means one more entry in `MODES`, a menu card, and a hide rule in the CSS.
+- **Audio unlock:** tapping a menu card calls `sound.unlock()`, so on iOS the applause works from the very first answer.
+
+### Flags (`js/flags.js`)
+
+- `flags/<code>.svg`, a 4:3 flag in `.flag-frame`. The frame is sized with container-query units (`min(100cqw, 133.33cqh)`), so it's always as large as possible without distortion.
+- `preloadAll` loads all 37 flags as soon as the flag game starts, so there's no flicker between rounds.
+- The `alt` text is deliberately generic ("Vlag van een Europees land"), so it doesn't give the answer away.
+- The menu pictures have `pointer-events: none`. Otherwise a tap on the picture would count as dragging an image, and the button wouldn't respond.
 
 ### Game rules (`js/game.js`)
 
@@ -106,10 +137,10 @@ The codes are ISO alpha-2; `XK` is used for Kosovo. The Dutch names come from `N
 ### Adding or removing a country
 
 1. In `tools/extract_map.py`, add the code to `PLAYABLE` and the Dutch name to `NAMES`.
-2. Run `python tools/extract_map.py`. This rewrites `data/europe.js` and prints each country's bounding box.
+2. Run `python tools/extract_map.py`. This rewrites `data/europe.js`, prints each country's bounding box, and downloads the flag to `flags/<code>.svg` if it's missing. Check that flag-icons has the code: https://github.com/lipis/flag-icons/tree/main/flags/4x3
    - The map frame (`viewBox`) is recalculated from all playable countries.
    - Overseas pieces outside `EUROPE_FRAME` (such as French Guiana and Svalbard) are dropped automatically.
-3. Test locally (see below). Check that the country is visible when highlighted, and that the longest name still fits on a button.
+3. Test locally (see below). Check that the country is visible when highlighted, that the flag shows in the flag game, and that the longest name still fits on a button.
 4. Update the country count in `README.md`, then commit and push (in both repos).
 
 Source-data gotchas:
@@ -130,6 +161,7 @@ Then open http://localhost:8765. ES modules don't work over `file://`, so double
 
 ## Licences and credits
 
+- **Flags:** flag-icons © 2013 Panayiotis Lipiridis, MIT. The full text is in `THIRD_PARTY_NOTICES.md` and `tools/FLAG_ICONS_LICENSE`, and it's credited in the footer.
 - **Map shapes:** jsvectormap © 2020 Mustafa Omar, MIT. The full text is in `THIRD_PARTY_NOTICES.md` and `tools/JSVECTORMAP_LICENSE`, and it's credited in the in-game footer.
 - **Applause:** "277021 sandermotions applause-2.wav" by Sandermotions (Wikimedia Commons, CC0). No credit is required, but it's credited anyway.
 - **Earlier cheer** (removed): Gregor Quendel, CC BY 4.0. If it ever comes back, the credit is required.
@@ -141,14 +173,15 @@ Then open http://localhost:8765. ES modules don't work over `file://`, so double
 - Montenegro, Kosovo and Slovenië are small (about 15–20 px on an iPad), so the ring is important.
 - The URL is case-sensitive (`/korilio/`). A forgiving redirect would need a user-site repo `dennisessers.github.io` with a 404 redirect. That was offered but not built.
 - Sound on iPad depends on the silent switch and Control Centre.
+- The flag frame uses container-query units (`cqw`/`cqh`), which need iPadOS/Safari 16 or newer (2022+). On older devices the flag may show at the wrong size.
 
 ## Ideas for later
 
 - **Difficulty levels:** "near" distractors (neighbouring countries), more choices, an optional timer. The `DEFAULT_SETTINGS` in `game.js` are ready for this.
 - **Hints:** first letter, flag, or reading the name aloud (Web Speech API, Dutch voice) for children who can't read yet.
-- **Reverse mode:** show a name and the child taps the country on the map.
+- **Reverse mode:** show a name and the child taps the country on the map (a new entry in `MODES`).
+- **Flag game, harder:** choose distractors with similar-looking flags (e.g. NL/LU, RO/MD, IE/IT).
 - **More regions / the whole world:** give `extract_map.py` a different `PLAYABLE` list and `EUROPE_FRAME`, and write it to e.g. `data/world.js`. `main.js` would then choose a region (for example via `?regio=`).
-- **Flags** on or next to the buttons.
 
 ## Picking this back up
 
