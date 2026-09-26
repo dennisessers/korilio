@@ -34,3 +34,11 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
+
+## Crowd cheering sounds
+
+`sounds/cheer.mp3` and `sounds/cheer-big.mp3` are trimmed excerpts (about 3 s and 6 s) of
+"04 - Strong cheering - II - Short" and "03 - Strong cheering - I" from
+[Free Crowd Cheering Sounds](https://opengameart.org/content/free-crowd-cheering-sounds)
+by **Gregor Quendel**, licensed under
+[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). The game fades them in and out when playing.
