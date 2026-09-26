@@ -243,6 +243,8 @@ html, body {
   padding: 0 0 6px;
 }
 
+.credit a { color: inherit; }
+
 @media (orientation: landscape) and (min-width: 700px) {
   .stage { flex-direction: row; }
   .map-wrap { flex: 1.8; }
