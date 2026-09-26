@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="KORILIO">
+  <meta name="theme-color" content="#bfe3f5">
+  <title>KORILIO – Find the Country</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="app">
+    <header class="bar">
+      <h1 class="logo">KORILIO</h1>
+      <div class="progress" id="progress" aria-live="polite"></div>
+      <button class="icon-btn" id="sound-toggle" type="button" aria-label="Sound on">🔊</button>
+    </header>
+
+    <main class="stage">
+      <div class="map-wrap">
+        <svg id="map" role="img" aria-label="Map of Europe with one country highlighted"
+             preserveAspectRatio="xMidYMid meet"></svg>
+      </div>
+
+      <section class="panel">
+        <p class="prompt" id="prompt">Which country is lit up?</p>
+        <div class="choices" id="choices"></div>
+      </section>
+    </main>
+
+    <footer class="credit">Map data: jsvectormap © Mustafa Omar (MIT)</footer>
+  </div>
+
+  <div class="overlay" id="summary" hidden>
+    <div class="card">
+      <div class="stars" id="summary-stars"></div>
+      <h2 id="summary-title">Well done!</h2>
+      <p id="summary-text"></p>
+      <button class="big-btn" id="play-again" type="button">Play again</button>
+    </div>
+  </div>
+
+  <div class="error-box" id="error-box" hidden></div>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
