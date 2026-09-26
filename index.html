@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="nl">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -7,7 +7,7 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="KORILIO">
   <meta name="theme-color" content="#bfe3f5">
-  <title>KORILIO – Find the Country</title>
+  <title>KORILIO – Zoek het land</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -15,30 +15,30 @@
     <header class="bar">
       <h1 class="logo">KORILIO</h1>
       <div class="progress" id="progress" aria-live="polite"></div>
-      <button class="icon-btn" id="sound-toggle" type="button" aria-label="Sound on">🔊</button>
+      <button class="icon-btn" id="sound-toggle" type="button" aria-label="Geluid aan">🔊</button>
     </header>
 
     <main class="stage">
       <div class="map-wrap">
-        <svg id="map" role="img" aria-label="Map of Europe with one country highlighted"
+        <svg id="map" role="img" aria-label="Kaart van Europa waarop één land oplicht"
              preserveAspectRatio="xMidYMid meet"></svg>
       </div>
 
       <section class="panel">
-        <p class="prompt" id="prompt">Which country is lit up?</p>
+        <p class="prompt" id="prompt">Welk land licht op?</p>
         <div class="choices" id="choices"></div>
       </section>
     </main>
 
-    <footer class="credit">Map data: jsvectormap © Mustafa Omar (MIT)</footer>
+    <footer class="credit">Kaartgegevens: jsvectormap © Mustafa Omar (MIT)</footer>
   </div>
 
   <div class="overlay" id="summary" hidden>
     <div class="card">
       <div class="stars" id="summary-stars"></div>
-      <h2 id="summary-title">Well done!</h2>
+      <h2 id="summary-title">Goed gedaan!</h2>
       <p id="summary-text"></p>
-      <button class="big-btn" id="play-again" type="button">Play again</button>
+      <button class="big-btn" id="play-again" type="button">Nog een keer</button>
     </div>
   </div>
 

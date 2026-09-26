@@ -1,6 +1,6 @@
 # KORILIO
 
-A geography game for kids. A country lights up on the map of Europe, and the player taps its name from four big buttons.
+A geography game for kids, entirely in Dutch. A country lights up on the map of Europe, and the player taps its name from four big buttons.
 
 **Play:** https://dennisessers.github.io/korilio/ (works on iPad in Safari; use *Share → Add to Home Screen* to run it full-screen)
 
@@ -23,7 +23,7 @@ Then open http://localhost:8000.
 
 ## Change the countries
 
-1. Edit `PLAYABLE` (and `NAME_OVERRIDES` if needed) in `tools/extract_map.py`.
+1. Edit `PLAYABLE` and the Dutch display names in `NAMES` in `tools/extract_map.py`.
 2. Run the script again:
 
 ```

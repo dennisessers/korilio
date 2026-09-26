@@ -18,8 +18,16 @@ PLAYABLE = [
     "CH", "AT", "IT", "PL", "CZ", "HU", "RO", "BG", "GR", "HR", "UA", "RS",
 ]
 
-# Kid-friendly display names where the source name differs.
-NAME_OVERRIDES = {"GB": "United Kingdom", "CZ": "Czechia"}
+# Dutch display names shown in the game (source names are English).
+NAMES = {
+    "GB": "Verenigd Koninkrijk", "IE": "Ierland", "IS": "IJsland", "NO": "Noorwegen",
+    "SE": "Zweden", "FI": "Finland", "DK": "Denemarken", "NL": "Nederland",
+    "BE": "België", "FR": "Frankrijk", "ES": "Spanje", "PT": "Portugal",
+    "DE": "Duitsland", "CH": "Zwitserland", "AT": "Oostenrijk", "IT": "Italië",
+    "PL": "Polen", "CZ": "Tsjechië", "HU": "Hongarije", "RO": "Roemenië",
+    "BG": "Bulgarije", "GR": "Griekenland", "HR": "Kroatië", "UA": "Oekraïne",
+    "RS": "Servië",
+}
 
 # Map-coordinate frame (source space is 900 x ~441) used to drop far-away
 # overseas parts (e.g. French Guiana, Svalbard) from playable countries.
@@ -106,7 +114,7 @@ def main():
         print(f"{code} {world[code]['name']:<16} bbox {b[0]:.0f},{b[1]:.0f} - {b[2]:.0f},{b[3]:.0f}")
         playable.append({
             "code": code,
-            "name": NAME_OVERRIDES.get(code, world[code]["name"]),
+            "name": NAMES.get(code, world[code]["name"]),
             "d": "".join(ch for ch, _ in kept),
             "cx": round(cx, 2),
             "cy": round(cy, 2),
@@ -135,7 +143,7 @@ def main():
         "// Map path data from jsvectormap (https://github.com/themustafaomar/jsvectormap),\n"
         "// Copyright (c) 2020 Mustafa Omar, MIT License. See THIRD_PARTY_NOTICES.md.\n"
     )
-    OUT.write_text(header + "export default " + json.dumps(data, separators=(",", ":")) + ";\n", encoding="utf-8")
+    OUT.write_text(header + "export default " + json.dumps(data, separators=(",", ":"), ensure_ascii=False) + ";\n", encoding="utf-8")
     print(f"\nviewBox {data['viewBox']}; {len(playable)} playable, {len(context)} context -> {OUT}")
 
 

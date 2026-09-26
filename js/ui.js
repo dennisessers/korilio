@@ -1,6 +1,6 @@
 const $ = (id) => document.getElementById(id);
 
-const CHEERS = ['Great job!', 'Yes! Well done!', 'Super!', 'You got it!', 'Awesome!'];
+const CHEERS = ['Goed zo!', 'Super!', 'Knap gedaan!', 'Helemaal goed!', 'Top!'];
 
 export function createUI() {
   const choicesEl = $('choices');
@@ -20,7 +20,7 @@ export function createUI() {
       buttons.set(c.code, b);
       choicesEl.append(b);
     }
-    promptEl.textContent = 'Which country is lit up?';
+    promptEl.textContent = 'Welk land licht op?';
     promptEl.className = 'prompt';
   }
 
@@ -28,7 +28,7 @@ export function createUI() {
     const b = buttons.get(code);
     b.classList.add('wrong');
     b.disabled = true;
-    promptEl.textContent = 'Not quite – try again!';
+    promptEl.textContent = 'Bijna! Probeer het nog eens!';
     promptEl.className = 'prompt try';
   }
 
@@ -37,23 +37,23 @@ export function createUI() {
       b.disabled = true;
       if (c === code) b.classList.add('correct');
     }
-    promptEl.textContent = `${CHEERS[Math.floor(Math.random() * CHEERS.length)]} That's ${name}!`;
+    promptEl.textContent = `${CHEERS[Math.floor(Math.random() * CHEERS.length)]} Dat is ${name}!`;
     promptEl.className = 'prompt yay';
   }
 
   function updateProgress({ played, total, firstTryCorrect, streak }) {
     const fire = streak >= 3 ? `   🔥 ${streak}` : '';
-    progressEl.textContent = `Country ${Math.min(played + 1, total)} of ${total}   ⭐ ${firstTryCorrect}${fire}`;
+    progressEl.textContent = `Land ${Math.min(played + 1, total)} van ${total}   ⭐ ${firstTryCorrect}${fire}`;
   }
 
   function showSummary({ firstTryCorrect, total, bestStreak }, onPlayAgain) {
     const ratio = firstTryCorrect / total;
     const stars = ratio >= 0.9 ? 3 : ratio >= 0.6 ? 2 : 1;
     $('summary-stars').textContent = '⭐'.repeat(stars);
-    $('summary-title').textContent = stars === 3 ? 'Amazing!' : stars === 2 ? 'Great work!' : 'Well done!';
+    $('summary-title').textContent = stars === 3 ? 'Geweldig!' : stars === 2 ? 'Heel goed!' : 'Goed gedaan!';
     $('summary-text').textContent =
-      `You found ${firstTryCorrect} of ${total} countries on the first try.` +
-      (bestStreak >= 3 ? ` Best streak: ${bestStreak} in a row!` : '');
+      `Je had ${firstTryCorrect} van de ${total} landen in één keer goed.` +
+      (bestStreak >= 3 ? ` Langste reeks: ${bestStreak} op rij!` : '');
     const overlay = $('summary');
     overlay.hidden = false;
     $('play-again').onclick = () => {
@@ -81,7 +81,7 @@ export function createSound(toggleBtn) {
 
   function render() {
     toggleBtn.textContent = enabled ? '🔊' : '🔇';
-    toggleBtn.setAttribute('aria-label', enabled ? 'Sound on' : 'Sound off');
+    toggleBtn.setAttribute('aria-label', enabled ? 'Geluid aan' : 'Geluid uit');
   }
 
   toggleBtn.addEventListener('click', () => {

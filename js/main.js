@@ -7,7 +7,7 @@ const ADVANCE_MS = 1400;
 
 window.addEventListener('error', (e) => {
   const box = document.getElementById('error-box');
-  box.textContent = `Oops: ${e.message}`;
+  box.textContent = `Oeps: ${e.message}`;
   box.hidden = false;
 });
 
