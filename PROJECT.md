@@ -29,7 +29,7 @@ Live with two modules (Kaart and Vlaggen) and an opening menu: 37 European count
 | `feafb24` | Sea-coloured gaps between neighbouring countries filled (made Kosovo look like a hole) |
 | `9b58ee5` | "Idee: @DennisEssers" added to the footer |
 | `cc2b7f4` | This PROJECT.md |
-| *(commit "Add flag game…")* | Second module **Vlaggen** plus an opening menu with the choice "Kaart" / "Vlaggen", hash navigation, 🏠 button, "Menu" on the end screen |
+| `3b62af0` | Second module **Vlaggen** plus an opening menu with the choice "Kaart" / "Vlaggen", hash navigation, 🏠 button, "Menu" on the end screen |
 
 ## Repo and git workflow
 
@@ -155,8 +155,11 @@ python -m http.server 8765
 ```
 
 Then open http://localhost:8765. ES modules don't work over `file://`, so double-clicking `index.html` won't work.
+- **Go straight to a module:** http://localhost:8765/#kaart or http://localhost:8765/#vlaggen. Without a hash you get the menu.
+- **Test both modules** after any change to `main.js`, `ui.js` or the CSS: menu → Kaart → 🏠 → Vlaggen → play a few rounds → end screen → "Menu".
 - **iPad view:** use Chrome DevTools → device toolbar (iPad, portrait and landscape). Or embed the page in an `<iframe>` of 768×1024.
 - **Real iPad:** push, wait about a minute, then refresh the Pages URL in Safari. GitHub Pages caches files for up to about 10 minutes, so the old version can briefly reappear.
+- **Test scripts in the browser (Claude in Chrome):** a round takes about 1.5 s, so play a full game in batches of about 14 rounds per script call, or the tool times out after 45 s. The screenshot tool sometimes returns a wrongly zoomed image right after a timeout; measure with `getBoundingClientRect()` instead.
 - **Node is not installed** on this PC; the tooling is Python only. There's also no ffmpeg; audio was trimmed with Python's `wave` module.
 
 ## Licences and credits
@@ -187,5 +190,5 @@ Then open http://localhost:8765. ES modules don't work over `file://`, so double
 
 1. `cd "C:\Users\denni\OneDrive\Documents\Claude tryouts\KORILIO"`
 2. `git pull`, and `git -C .. pull` for the umbrella repo.
-3. Read this file. Then run `python -m http.server 8765` and play a round at localhost.
+3. Read this file. Then run `python -m http.server 8765` and play a round of both modules (Kaart and Vlaggen) at localhost.
 4. After changes: commit and push in `KORILIO`, then `git add KORILIO` and commit and push in the umbrella repo. Wait for Pages to show `built`, then check on the iPad.
