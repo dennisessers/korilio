@@ -57,7 +57,7 @@ Everything is in Dutch, built for touch on an iPad, with no timer and no penalti
 | `9b58ee5` | "Idee: @DennisEssers" added to the footer |
 | `cc2b7f4` | This PROJECT.md |
 | `3b62af0` | Second module **Vlaggen** plus an opening menu with the choice "Kaart" / "Vlaggen", hash navigation, 🏠 button, "Menu" on the end screen |
-| *(commit "Add the Americas…")* | Regions: Noord- en Midden-Amerika (16) and Zuid-Amerika (12) added next to Europa, a region screen after choosing Kaart/Vlaggen, `data/europe.js` renamed to `data/europa.js`, extractor builds all regions, tiny-country dot now based on on-screen size |
+| `1808bb4` | Regions: Noord- en Midden-Amerika (16) and Zuid-Amerika (12) added next to Europa, a region screen after choosing Kaart/Vlaggen, `data/europe.js` renamed to `data/europa.js`, extractor builds all regions, tiny-country dot now based on on-screen size |
 | `ac64e41` + this commit | PROJECT.md brought up to date with the current state |
 
 ## Repo and git workflow
