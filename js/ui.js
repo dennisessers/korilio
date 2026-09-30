@@ -111,7 +111,12 @@ export function createSound(toggleBtn) {
 
   toggleBtn.addEventListener('click', () => {
     enabled = !enabled;
-    if (!enabled) stopApplause();
+    if (enabled) {
+      unlock();
+      tone(880, 0.3, 0.15);
+    } else {
+      stopApplause();
+    }
     try {
       localStorage.setItem(SOUND_KEY, enabled ? 'on' : 'off');
     } catch {}
@@ -121,19 +126,32 @@ export function createSound(toggleBtn) {
 
   function load() {
     decoded ??= raw
-      .then((buf) => buf && new Promise((ok, fail) => audioCtx.decodeAudioData(buf, ok, fail)))
-      .catch(() => null);
+      .then((buf) => buf && new Promise((ok, fail) => audioCtx.decodeAudioData(buf.slice(0), ok, fail)))
+      .catch(() => null)
+      .then((buffer) => {
+        if (!buffer) decoded = null;
+        return buffer;
+      });
     return decoded;
   }
 
+  // Must run inside a tap handler: iOS only starts audio from a user gesture.
   function unlock() {
     if (!audioCtx) {
       const Ctx = window.AudioContext || window.webkitAudioContext;
       if (!Ctx) return;
+      // iPadOS 16.4+: play like media, so silent mode doesn't mute the game.
+      if (navigator.audioSession) navigator.audioSession.type = 'playback';
       audioCtx = new Ctx();
+      // Older iOS only unlocks after a buffer has actually been started in the gesture.
+      const silent = audioCtx.createBufferSource();
+      silent.buffer = audioCtx.createBuffer(1, 1, 22050);
+      silent.connect(audioCtx.destination);
+      silent.start(0);
       load();
     }
-    if (audioCtx.state === 'suspended') audioCtx.resume();
+    // iOS uses "interrupted" after an app switch, screen lock or call.
+    if (audioCtx.state !== 'running') audioCtx.resume();
   }
 
   async function applause(kind) {
@@ -157,6 +175,7 @@ export function createSound(toggleBtn) {
   }
 
   function tone(freq, duration, gain) {
+    if (!audioCtx) return;
     const osc = audioCtx.createOscillator();
     const g = audioCtx.createGain();
     osc.type = 'triangle';

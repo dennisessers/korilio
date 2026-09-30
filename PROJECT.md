@@ -37,6 +37,7 @@ Everything is in Dutch, built for touch on an iPad, with no timer and no penalti
 
 **Not done yet / open:**
 - The **flag game and the Americas haven't been checked on a real iPad yet** (tested in Chrome only).
+- **Sound on iPad:** the user reported no sound (2026-10-01). The iPad fixes in `createSound` (see *Sound*) still need to be confirmed on the device.
 - **Git layout:** KORILIO's git data still sits in `KORILIO/.git` instead of `.git/modules/` (see *Repo and git workflow*). It works; tidying it is optional.
 - **URL capitals:** the URL is case-sensitive; a redirect for `/KORILIO/` was offered but not built.
 - **Difficulty levels, hints, reverse mode:** not built (see *Ideas for later*).
@@ -161,11 +162,17 @@ Borders are white 1px lines with `vector-effect: non-scaling-stroke`, so they lo
 
 ### Sound (`js/ui.js` → `createSound`)
 
-- iOS only allows audio after a tap, so the `AudioContext` is created on the first tap (`unlock()`, called on a menu tap and on every answer). The WAV file is fetched when the page loads and decoded at that first tap.
+- iOS only allows audio after a tap, so the `AudioContext` is created on the first tap (`unlock()`, called on a menu tap, the sound button and every answer). The WAV file is fetched when the page loads and decoded at that first tap.
 - `stop()` cuts off the applause when leaving a game.
+- **iPad/Safari specifics in `unlock()`:**
+  - Sets `navigator.audioSession.type = 'playback'` (iPadOS 16.4+) before creating the context, so the iPad's silent mode doesn't mute the game.
+  - Starts a 1-sample silent buffer inside the tap, because older iOS versions only unlock audio after a sound was actually started in a gesture.
+  - Calls `resume()` whenever the state isn't `running`. iOS uses `interrupted` (not `suspended`) after an app switch, screen lock or call.
+  - If decoding the WAV fails, the next play tries again (the file is decoded from a copy, because `decodeAudioData` consumes its buffer).
+- **Sound check:** tapping 🔇 → 🔊 plays a short "ding" straight away, so it's easy to hear whether sound works on a device.
 - **Correct answer:** the first 2.2 s of the applause at volume 0.6. **End of game:** the full 5.5 s at volume 0.9. Both fade in and out.
 - **Wrong answer:** a soft low triangle-wave tone (Web Audio, no file).
-- The 🔊/🔇 setting is saved in `localStorage` under `korilio.sound`. The iPad's silent switch also mutes the game.
+- The 🔊/🔇 setting is saved in `localStorage` under `korilio.sound`. On iPadOS older than 16.4, silent mode still mutes the game.
 
 ## Countries (65 in 3 regions)
 
@@ -228,7 +235,8 @@ python -m http.server 8765
 Then open http://localhost:8765. ES modules don't work over `file://`, so double-clicking `index.html` won't work.
 - **Go straight to a game:** http://localhost:8765/#kaart/noord-amerika, http://localhost:8765/#vlaggen/europa, etc. `#kaart` alone gives the region screen; without a hash you get the menu.
 - **Test both modules and several regions** after any change to `main.js`, `ui.js` or the CSS: menu → Kaart → region → a few rounds → back → another region → 🏠 → Vlaggen → region → end screen → "Menu".
-- **Cache-busting:** `index.html` loads `css/style.css?v=3` and `js/main.js?v=3`. Raise the number after a change to those files, so iPads don't mix an old stylesheet with new HTML. The other modules have no version and can be cached for up to 10 minutes.
+- **Cache-busting:** `index.html` loads `css/style.css?v=4` and `js/main.js?v=4`, and `main.js` imports `./ui.js?v=4`. Raise the number after a change to those files, so iPads don't mix old and new files. The other modules have no version and can be cached for up to 10 minutes; give an import a `?v=` too when it changes in a way that matters.
+- **When the browser tool isn't available:** a headless Edge smoke test still catches JavaScript errors: `msedge --headless=new --virtual-time-budget=4000 --dump-dom "http://localhost:8765/#kaart/europa"`, then check that `body` has `data-screen="game"`, there are 4 `class="choice"` elements, and the error box is still `hidden`. Sound can only be tested with a real tap.
 - **iPad view:** use Chrome DevTools → device toolbar (iPad, portrait and landscape). Or embed the page in an `<iframe>` of 768×1024.
 - **Real iPad:** push, wait about a minute, then refresh the Pages URL in Safari. GitHub Pages caches files for up to about 10 minutes, so the old version can briefly reappear.
 - **Test scripts in the browser (Claude in Chrome):** a round takes about 1.5 s, so play a full game in batches of about 14 rounds per script call, or the tool times out after 45 s. The screenshot tool sometimes returns a wrongly zoomed image right after a timeout; measure with `getBoundingClientRect()` instead.
@@ -247,7 +255,7 @@ Then open http://localhost:8765. ES modules don't work over `file://`, so double
 - Coastlines are coarse, because the source is a world map at low resolution. Small islands are simplified or missing.
 - Montenegro, Kosovo and Slovenië are small (about 15–20 px on an iPad), so the ring is important.
 - The URL is case-sensitive (`/korilio/`). A forgiving redirect would need a user-site repo `dennisessers.github.io` with a 404 redirect. That was offered but not built.
-- Sound on iPad depends on the silent switch and Control Centre.
+- Sound on iPad: the silent-mode workaround needs iPadOS 16.4+. The volume buttons and the 🔊 button still apply.
 - The flag frame uses container-query units (`cqw`/`cqh`), which need iPadOS/Safari 16 or newer (2022+). On older devices the flag may show at the wrong size.
 
 ## Ideas for later

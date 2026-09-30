@@ -2,7 +2,7 @@ import { REGIONS } from './regions.js';
 import { createGame } from './game.js';
 import { createMap } from './map.js';
 import { createFlagView, flagUrl } from './flags.js';
-import { createUI, createSound } from './ui.js';
+import { createUI, createSound } from './ui.js?v=4';
 
 const ADVANCE_MS = 1400;
 const SVG_NS = 'http://www.w3.org/2000/svg';
