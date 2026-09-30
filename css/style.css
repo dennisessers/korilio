@@ -122,13 +122,19 @@ html, body {
   -webkit-user-drag: none;
 }
 
-/* Screens: body[data-screen] is "menu", "kaart" or "vlaggen". */
-[data-screen="menu"] .stage,
-[data-screen="menu"] .game-only { display: none; }
-[data-screen="kaart"] .menu,
-[data-screen="vlaggen"] .menu,
-[data-screen="kaart"] .flag-wrap,
-[data-screen="vlaggen"] .map-wrap { display: none; }
+/* Screens: body[data-screen] is "menu", "regions" or "game"; body[data-mode] is "kaart" or "vlaggen". */
+body:not([data-screen="menu"]) #menu,
+body:not([data-screen="regions"]) #regions,
+body:not([data-screen="game"]) .stage,
+body[data-screen="menu"] #home { display: none; }
+body:not([data-screen="game"]) #progress { visibility: hidden; }
+body[data-mode="kaart"] .flag-wrap,
+body[data-mode="vlaggen"] .map-wrap,
+body[data-mode="kaart"] .region-flags,
+body[data-mode="vlaggen"] .region-map { display: none; }
+
+.region-cards { max-width: 1100px; }
+.region-card .menu-label { font-size: clamp(1.2rem, 1.1vw + 0.8rem, 1.7rem); line-height: 1.15; }
 
 .menu {
   flex: 1;
@@ -218,6 +224,9 @@ html, body {
   .menu-cards { flex-direction: column; align-items: center; }
   .menu-card { width: 100%; }
   .menu-pic { aspect-ratio: 16 / 9; }
+  .region-card { flex-direction: row; min-height: 0; max-width: 560px; text-align: left; }
+  .region-card .menu-pic { width: 45%; flex: none; aspect-ratio: 4 / 3; }
+  .region-card .menu-label { flex: 1; }
 }
 
 .map-svg {

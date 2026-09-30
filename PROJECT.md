@@ -1,12 +1,13 @@
 # KORILIO: map and flag quiz for kids
 
-A geography game with two modules for the same 37 European countries, chosen on an opening screen:
-- **Kaart** (map): a country lights up on a map of Europe, and the child taps its name from four big buttons.
+A geography game with two modules, chosen on an opening screen, each playable for three regions (65 countries in total):
+- **Kaart** (map): a country lights up on the map, and the child taps its name from four big buttons.
 - **Vlaggen** (flags): a flag is shown, and the child taps the country name from four big buttons.
+- **Regions:** Europa (37), Noord- en Midden-Amerika (16) and Zuid-Amerika (12). The child picks one after choosing Kaart or Vlaggen.
 
 Everything is in Dutch, built for touch on an iPad, with no timer and no penalties.
 
-- **Play:** https://dennisessers.github.io/korilio/ (lowercase! `/KORILIO/` gives a 404). Direct links: `#kaart`, `#vlaggen`
+- **Play:** https://dennisessers.github.io/korilio/ (lowercase! `/KORILIO/` gives a 404). Direct links: `#kaart/europa`, `#vlaggen/zuid-amerika`, etc. (`#kaart` alone opens the region choice)
 - **Code:** https://github.com/dennisessers/korilio (public, because GitHub Pages needs that)
 - **Idea:** @DennisEssers. Built with Claude Code.
 
@@ -16,13 +17,15 @@ Everything is in Dutch, built for touch on an iPad, with no timer and no penalti
 
 **What's there:**
 - An opening menu, "Kies een spel" (choose a game), with two cards: **Kaart** and **Vlaggen**.
-- **Kaart:** 37 countries light up on the map. The kid picks the Dutch name from 4 buttons.
-- **Vlaggen:** the flag of the same 37 countries, with the same 4-button question.
+- Then a region screen, "Kaart: kies een werelddeel" (choose a continent), with three cards: **Europa**, **Noord- en Midden-Amerika** and **Zuid-Amerika**.
+  - The cards show a mini map of the region in the Kaart game, and 4 flags in the Vlaggen game.
+- **Kaart:** the countries of the chosen region light up on that region's map. The kid picks the Dutch name from 4 buttons (all 4 from the same region).
+- **Vlaggen:** the flags of the same countries, with the same 4-button question.
 - **Shared by both:**
   - Dutch text, no timer; after a wrong answer the kid just tries again.
   - Score ⭐ and streak 🔥; an end screen with 1–3 stars, "Nog een keer" (play again) and "Menu".
   - A soft applause for a correct answer (can be muted, and the setting is remembered).
-  - 🏠 back to the menu; navigation through the URL hash (`#kaart`, `#vlaggen`).
+  - 🏠 back to the main menu; navigation through the URL hash (`#kaart/europa` etc.).
   - Works on iPad in portrait and landscape.
 - There's no build step: pushing to `main` updates the live site within about a minute.
 
@@ -30,9 +33,10 @@ Everything is in Dutch, built for touch on an iPad, with no timer and no penalti
 - In Chrome, both modules have been played through from start to finish.
 - The layout was checked in landscape and at iPad-portrait size (768×1024).
 - The user plays the map game on a real iPad.
+- The Americas regions: all four combinations (Kaart/Vlaggen × North/South) played through in Chrome. Europe still works after switching maps.
 
 **Not done yet / open:**
-- The **flag game hasn't been checked on a real iPad yet** (tested in Chrome only).
+- The **flag game and the Americas haven't been checked on a real iPad yet** (tested in Chrome only).
 - **Git layout:** KORILIO's git data still sits in `KORILIO/.git` instead of `.git/modules/` (see *Repo and git workflow*). It works; tidying it is optional.
 - **URL capitals:** the URL is case-sensitive; a redirect for `/KORILIO/` was offered but not built.
 - **Difficulty levels, hints, reverse mode:** not built (see *Ideas for later*).
@@ -53,6 +57,7 @@ Everything is in Dutch, built for touch on an iPad, with no timer and no penalti
 | `9b58ee5` | "Idee: @DennisEssers" added to the footer |
 | `cc2b7f4` | This PROJECT.md |
 | `3b62af0` | Second module **Vlaggen** plus an opening menu with the choice "Kaart" / "Vlaggen", hash navigation, 🏠 button, "Menu" on the end screen |
+| *(commit "Add the Americas…")* | Regions: Noord- en Midden-Amerika (16) and Zuid-Amerika (12) added next to Europa, a region screen after choosing Kaart/Vlaggen, `data/europe.js` renamed to `data/europa.js`, extractor builds all regions, tiny-country dot now based on on-screen size |
 | `ac64e41` + this commit | PROJECT.md brought up to date with the current state |
 
 ## Repo and git workflow
@@ -68,16 +73,17 @@ Everything is in Dutch, built for touch on an iPad, with no timer and no penalti
 
 | File | Role |
 |---|---|
-| `index.html` | Page: header (🏠, logo, progress, sound button), opening menu `#menu` (two cards), game area `.stage` with `.map-wrap` (`<svg id="map">`) and `.flag-wrap` (`<img id="flag">`), prompt, answer buttons, footer credit, end-screen overlay (Nog een keer / Menu), error box |
-| `css/style.css` | All styling. Colours are variables in `:root`. Touch rules, landscape/portrait layout, screen switching via `body[data-screen]`, menu, flag frame, map layers (`.map-svg`, shared by the game map and the menu picture), animations |
-| `js/main.js` | Connects everything: `MODES` (kaart/vlaggen), hash routing (`route`, `showMenu`, `startGame`), round flow, double-tap protection and cancelling the pending round (`advanceTimer`) |
+| `index.html` | Page: header (🏠, logo, progress, sound button), opening menu `#menu` (two cards), region screen `#regions` (cards built by `main.js`), game area `.stage` with `.map-wrap` (`<svg id="map">`) and `.flag-wrap` (`<img id="flag">`), prompt, answer buttons, footer credit, end-screen overlay (Nog een keer / Menu), error box |
+| `css/style.css` | All styling. Colours are variables in `:root`. Touch rules, landscape/portrait layout, screen switching via `body[data-screen]` and `body[data-mode]`, menu and region cards, flag frame, map layers (`.map-svg`, shared by the game map and the menu picture), animations |
+| `js/main.js` | Connects everything: `MODES` (kaart/vlaggen), builds the region cards (`buildMenus`), hash routing (`route`, `showMenu`, `showRegions`, `startGame(mode, region)`), rebuilds the game map when the region changes, round flow, double-tap protection and cancelling the pending round (`advanceTimer`) |
+| `js/regions.js` | `REGIONS`: key (used in the URL), Dutch name, data file and the 4 flags shown on the region card |
 | `js/game.js` | Pure game logic, no DOM: `createGame`, `shuffle`, `pickDistractors`, `DEFAULT_SETTINGS` |
 | `js/map.js` | `createMap(svg, data)` draws the layers and provides `highlight`, `markCorrect`, `flashGuess` and `clear` |
 | `js/flags.js` | `createFlagView(img)`: `show(country)`, `markCorrect()` (green frame), `preloadAll(countries)`; `flagUrl(code)` |
 | `js/ui.js` | `createUI()` (buttons, prompt, progress, end screen, `hideSummary`) and `createSound()` (applause, a soft tone for a wrong answer, `stop()`) |
-| `data/europe.js` | **Generated.** `{ viewBox, playable:[{code,name,d,cx,cy}], context:[{code,d}] }` |
-| `tools/extract_map.py` | Generates `data/europe.js` from `tools/world.js` and downloads any missing `flags/<code>.svg`. Python standard library only |
-| `flags/<code>.svg` | 4×3 flags from flag-icons (commit `086f7e9`), lowercase ISO codes (`xk` = Kosovo). 37 files, 383 KB in total; Servië (181 KB), Spanje (81 KB) and Montenegro (56 KB) are the big ones because of their detailed coats of arms |
+| `data/europa.js`, `data/noord-amerika.js`, `data/zuid-amerika.js` | **Generated**, one per region. `{ viewBox, playable:[{code,name,d,cx,cy}], context:[{code,d}] }` |
+| `tools/extract_map.py` | Generates every `data/<region>.js` from `tools/world.js` (config in `REGIONS`) and downloads any missing `flags/<code>.svg`. Python standard library only |
+| `flags/<code>.svg` | 4×3 flags from flag-icons (commit `086f7e9`), lowercase ISO codes (`xk` = Kosovo). 65 files, 847 KB in total (Europa 383 KB, Noord-Amerika 304 KB, Zuid-Amerika 159 KB). The big ones are flags with detailed coats of arms: Servië 181 KB, Bolivia 103 KB, Mexico 85 KB, Spanje 81 KB, Montenegro 56 KB |
 | `tools/FLAG_ICONS_LICENSE` | MIT licence of flag-icons |
 | `tools/world.js` | Pinned copy of jsvectormap's `world.js` (commit `08283f0`) |
 | `tools/JSVECTORMAP_LICENSE` | MIT licence of jsvectormap |
@@ -90,17 +96,20 @@ Everything is in Dutch, built for touch on an iPad, with no timer and no penalti
 
 ### Screens and navigation (`js/main.js`)
 
-- `body[data-screen]` is `menu`, `kaart` or `vlaggen`. The HTML starts as `menu`, so nothing flashes on load. The CSS hides what isn't needed:
-  - on the menu: `.stage` and the `.game-only` elements (🏠 and progress);
-  - in a game: `.menu` and the other game's picture (`.map-wrap` or `.flag-wrap`).
+- `body[data-screen]` is `menu`, `regions` or `game`; `body[data-mode]` is `kaart` or `vlaggen` (empty on the menu). The HTML starts as `menu`, so nothing flashes on load. The CSS hides what isn't needed:
+  - only the current screen (`#menu`, `#regions` or `.stage`) is shown;
+  - 🏠 is hidden on the menu, and the progress is only visible in a game;
+  - per mode, the other game's picture (`.map-wrap` or `.flag-wrap`) and the other kind of region picture (`.region-map` or `.region-flags`) are hidden.
 - **URL hash is the source of truth:** `route()` runs on load and on every `hashchange`.
-  - `#kaart` or `#vlaggen` → `startGame(key)`; anything else → `showMenu()`.
-  - The menu cards and 🏠 only change `location.hash`. So the browser back button, the iPad back swipe, refresh and direct links all work.
+  - The hash is `#<mode>/<region>`. `#kaart/europa` → `startGame('kaart', 'europa')`; `#kaart` alone → `showRegions('kaart')`; anything else → `showMenu()`.
+  - The menu cards, region cards and 🏠 only change `location.hash`. So the browser back button (game → region screen → menu), the iPad back swipe, refresh and direct links all work.
+- **Region data:** all three data files are imported at start (about 60 KB together). The game map `<svg id="map">` is rebuilt with `createMap` only when the Kaart game switches to another region; the choices always come from the same region.
 - **Leaving or restarting a game** (`stopGame`) clears the pending next-round timer, stops the applause and closes the end screen, so nothing from the old game fires later.
 - **`MODES`** holds, per module: the question (`prompt`) plus `show(country)`, `wrong(code)` and `correct(code)`.
   - **Kaart:** `map.highlight` / `map.flashGuess` / `map.markCorrect`.
   - **Vlaggen:** `flagView.show`, nothing extra on a wrong answer (the button still greys out), and a green frame on a correct one.
   - Adding a third module means one more entry in `MODES`, a menu card, and a hide rule in the CSS.
+  - Adding a region: see *Adding a region* below.
 - **Audio unlock:** tapping a menu card calls `sound.unlock()`, so on iOS the applause works from the very first answer. If a game is opened directly via a link (without the menu), the first answer tap unlocks the audio instead.
 - **Menu pictures:**
   - The Kaart card is a second `createMap(...)` drawn into `<svg id="menu-map">` (non-interactive, `preserveAspectRatio="xMidYMid slice"`).
@@ -110,8 +119,8 @@ Everything is in Dutch, built for touch on an iPad, with no timer and no penalti
 ### Flags (`js/flags.js`)
 
 - `flags/<code>.svg`, a 4:3 flag in `.flag-frame`. The frame is sized with container-query units (`min(100cqw, 133.33cqh)`), so it's always as large as possible without distortion.
-- `preloadAll` loads all 37 flags (383 KB) as soon as the flag game starts, so there's no flicker between rounds.
-- The `alt` text is deliberately generic ("Vlag van een Europees land"), so it doesn't give the answer away.
+- `preloadAll` loads the flags of the chosen region as soon as its flag game starts (at most 383 KB, for Europe), so there's no flicker between rounds. Flags already loaded are skipped.
+- The `alt` text is deliberately generic ("Vlag van een land"), so it doesn't give the answer away.
 - The menu pictures have `pointer-events: none`. Otherwise a tap on the picture would count as dragging an image, and the button wouldn't respond.
 
 ### Game rules (`js/game.js`)
@@ -132,7 +141,8 @@ The SVG layers, drawn bottom to top:
 3. `g.context`: grey countries that are never asked about (Russia, Belarus, Turkey, North Africa, …).
 4. `g.playable`: the quiz countries (cream), each with `data-code`.
 5. `g.markers`: a pulsing ring around the target country.
-   - Countries smaller than 40% of the ring radius also get a solid orange **dot** (`.dot`, currently only Luxemburg). It turns green after a correct answer.
+   - Countries smaller than 14 px on screen (`TINY_PX` in `map.js`, measured at the moment they light up) also get a solid orange **dot** (`.dot`). It turns green after a correct answer.
+   - On a laptop screen that's Luxemburg in Europe, and Belize, El Salvador, Jamaica, Haïti and Trinidad en Tobago in North America. On a smaller screen (iPad portrait) a few more can qualify, such as Kosovo.
 
 Borders are white 1px lines with `vector-effect: non-scaling-stroke`, so they look the same at any screen size.
 
@@ -157,25 +167,52 @@ Borders are white 1px lines with `vector-effect: non-scaling-stroke`, so they lo
 - **Wrong answer:** a soft low triangle-wave tone (Web Audio, no file).
 - The 🔊/🔇 setting is saved in `localStorage` under `korilio.sound`. The iPad's silent switch also mutes the game.
 
-## Countries (37)
+## Countries (65 in 3 regions)
 
-The codes are ISO alpha-2; `XK` is used for Kosovo. The Dutch names come from `NAMES` in `tools/extract_map.py`.
+The codes are ISO alpha-2; `XK` is used for Kosovo. The Dutch names come from `NAMES` in `tools/extract_map.py`, the lists per region from `REGIONS` there.
 
+**Europa (37):**
 > GB Verenigd Koninkrijk · IE Ierland · IS IJsland · NO Noorwegen · SE Zweden · FI Finland · DK Denemarken · NL Nederland · BE België · FR Frankrijk · ES Spanje · PT Portugal · DE Duitsland · CH Zwitserland · AT Oostenrijk · IT Italië · PL Polen · CZ Tsjechië · HU Hongarije · RO Roemenië · BG Bulgarije · GR Griekenland · HR Kroatië · UA Oekraïne · RS Servië · EE Estland · LV Letland · LT Litouwen · SK Slowakije · SI Slovenië · BA Bosnië en Herzegovina · AL Albanië · MK Noord-Macedonië · ME Montenegro · MD Moldavië · LU Luxemburg · XK Kosovo
 
-**Not playable (grey only):**
+**Noord- en Midden-Amerika (16):**
+> CA Canada · US Verenigde Staten · MX Mexico · GT Guatemala · BZ Belize · SV El Salvador · HN Honduras · NI Nicaragua · CR Costa Rica · PA Panama · CU Cuba · JM Jamaica · HT Haïti · DO Dominicaanse Republiek · BS Bahama's · TT Trinidad en Tobago
+
+**Zuid-Amerika (12):**
+> CO Colombia · VE Venezuela · GY Guyana · SR Suriname · EC Ecuador · PE Peru · BR Brazilië · BO Bolivia · PY Paraguay · UY Uruguay · AR Argentinië · CL Chili
+
+The Americas are split in two because a single map from Canada to Chile would be very tall. Central America and the Caribbean would then be only a few pixels on an iPad.
+
+**Only independent countries are playable** (the user's choice).
+- Greenland, Puerto Rico, the Falklands and French Guiana are grey on the map.
+- For the United States, Alaska is included; Hawaii and the Aleutian pieces on the far side of the world map are dropped (`exclude` box and frame in `REGIONS`).
+- The small Caribbean island states (Barbados, Grenada, St. Lucia, St. Vincent, Antigua, St. Kitts, Dominica) are **not in the source data**.
+
+**Europe, not playable (grey only):**
 - **Russia:** it would stretch the map across Asia.
 - **Belarus, Turkey, Cyprus:** could be added. Belarus is easy. Turkey and Cyprus would widen or shift the map frame to the south-east.
 - **Micro-states** (Andorra, Monaco, San Marino, Vatican, Liechtenstein, Malta) are **not in the source data at all**, so they can't be added without other map data.
 
 ### Adding or removing a country
 
-1. In `tools/extract_map.py`, add the code to `PLAYABLE` and the Dutch name to `NAMES`.
-2. Run `python tools/extract_map.py`. This rewrites `data/europe.js`, prints each country's bounding box, and downloads the flag to `flags/<code>.svg` if it's missing. Check that flag-icons has the code: https://github.com/lipis/flag-icons/tree/main/flags/4x3
-   - The map frame (`viewBox`) is recalculated from all playable countries.
-   - Overseas pieces outside `EUROPE_FRAME` (such as French Guiana and Svalbard) are dropped automatically.
+1. In `tools/extract_map.py`, add the code to the region's `playable` list in `REGIONS`, and the Dutch name to `NAMES`.
+2. Run `python tools/extract_map.py`. This rewrites every `data/<region>.js`, prints each country's bounding box, and downloads the flag to `flags/<code>.svg` if it's missing. Check that flag-icons has the code: https://github.com/lipis/flag-icons/tree/main/flags/4x3
+   - The map frame (`viewBox`) is recalculated from all playable countries of that region.
+   - Pieces of a country whose centre lies outside the region's `frame`, or inside one of its `exclude` boxes, are dropped (French Guiana and Svalbard for Europe, Hawaii for North America).
 3. Test locally (see below). Check that the country is visible when highlighted, that the flag shows in the flag game, and that the longest name still fits on a button.
 4. Update the country count in `README.md`, then commit and push (in both repos).
+
+### Adding a region (e.g. Afrika, Azië)
+
+1. In `tools/extract_map.py`, add an entry to `REGIONS`:
+   - a key (lowercase, also used in the URL);
+   - the `playable` codes;
+   - a `frame` (source coordinates: x 0–900, y 0–441; the world map uses the Miller projection with its central meridian at 11.5°E);
+   - optionally `exclude` boxes.
+
+   Add Dutch names for the codes to `NAMES`.
+2. Run the script. It writes `data/<key>.js` and downloads the flags.
+3. In `js/regions.js`: import the data file and add the region with its Dutch name and 4 flags for the card. The region screen picks it up automatically.
+4. Check that the region cards still fit (4 cards in a row in landscape, stacked in portrait), then test both modules and check which countries get a dot.
 
 Source-data gotchas:
 - Some territories have placeholder keys (`_0`, `_1`, `_2`). The script maps them to proper codes through `CODE_BY_NAME`.
@@ -189,8 +226,9 @@ python -m http.server 8765
 ```
 
 Then open http://localhost:8765. ES modules don't work over `file://`, so double-clicking `index.html` won't work.
-- **Go straight to a module:** http://localhost:8765/#kaart or http://localhost:8765/#vlaggen. Without a hash you get the menu.
-- **Test both modules** after any change to `main.js`, `ui.js` or the CSS: menu → Kaart → 🏠 → Vlaggen → play a few rounds → end screen → "Menu".
+- **Go straight to a game:** http://localhost:8765/#kaart/noord-amerika, http://localhost:8765/#vlaggen/europa, etc. `#kaart` alone gives the region screen; without a hash you get the menu.
+- **Test both modules and several regions** after any change to `main.js`, `ui.js` or the CSS: menu → Kaart → region → a few rounds → back → another region → 🏠 → Vlaggen → region → end screen → "Menu".
+- **Cache-busting:** `index.html` loads `css/style.css?v=3` and `js/main.js?v=3`. Raise the number after a change to those files, so iPads don't mix an old stylesheet with new HTML. The other modules have no version and can be cached for up to 10 minutes.
 - **iPad view:** use Chrome DevTools → device toolbar (iPad, portrait and landscape). Or embed the page in an `<iframe>` of 768×1024.
 - **Real iPad:** push, wait about a minute, then refresh the Pages URL in Safari. GitHub Pages caches files for up to about 10 minutes, so the old version can briefly reappear.
 - **Test scripts in the browser (Claude in Chrome):** a round takes about 1.5 s, so play a full game in batches of about 14 rounds per script call, or the tool times out after 45 s. The screenshot tool sometimes returns a wrongly zoomed image right after a timeout; measure with `getBoundingClientRect()` instead.
@@ -219,11 +257,12 @@ Then open http://localhost:8765. ES modules don't work over `file://`, so double
 - **Smaller flags:** optimise the big SVGs (Servië, Spanje, Montenegro) with e.g. SVGO if loading on a slow connection becomes a problem.
 - **Reverse mode:** show a name and the child taps the country on the map (a new entry in `MODES`).
 - **Flag game, harder:** choose distractors with similar-looking flags (e.g. NL/LU, RO/MD, IE/IT).
-- **More regions / the whole world:** give `extract_map.py` a different `PLAYABLE` list and `EUROPE_FRAME`, and write it to e.g. `data/world.js`. `main.js` would then choose a region (for example via `?regio=`).
+- **More regions:** Afrika, Azië, Oceanië (see *Adding a region*). With 4 or more regions the region cards may need a 2×2 grid.
+- **"Hele wereld" as its own region:** probably only as a flag game; the world map is too small for Central America or Europe's small countries.
 
 ## Picking this back up
 
 1. `cd "C:\Users\denni\OneDrive\Documents\Claude tryouts\KORILIO"`
 2. `git pull`, and `git -C .. pull` for the umbrella repo.
-3. Read this file. Then run `python -m http.server 8765` and play a round of both modules (Kaart and Vlaggen) at localhost.
+3. Read this file. Then run `python -m http.server 8765` and play a round of both modules (Kaart and Vlaggen) in a couple of regions at localhost.
 4. After changes: commit and push in `KORILIO`, then `git add KORILIO` and commit and push in the umbrella repo. Wait for Pages to show `built`, then check on the iPad.

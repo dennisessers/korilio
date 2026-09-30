@@ -1,8 +1,9 @@
-"""Build data/europe.js from jsvectormap's world.js (MIT, (c) 2020 Mustafa Omar)
-and download any missing flags/<code>.svg from flag-icons (MIT, (c) 2013 Panayiotis Lipiridis).
+"""Build data/<region>.js for every region in REGIONS from jsvectormap's world.js
+(MIT, (c) 2020 Mustafa Omar) and download any missing flags/<code>.svg from
+flag-icons (MIT, (c) 2013 Panayiotis Lipiridis).
 
 Usage:  python tools/extract_map.py
-Edit PLAYABLE to change which countries appear in the quiz.
+Edit a region's "playable" list (and NAMES) to change which countries appear.
 """
 import json
 import re
@@ -12,16 +13,36 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 SOURCE = ROOT / "tools" / "world.js"
 SOURCE_URL = "https://raw.githubusercontent.com/themustafaomar/jsvectormap/08283f02227fbf6b63b8da34a43069adfd89bdc7/packages/maps/src/world.js"
-OUT = ROOT / "data" / "europe.js"
+DATA_DIR = ROOT / "data"
 FLAGS_DIR = ROOT / "flags"
 FLAG_URL = "https://raw.githubusercontent.com/lipis/flag-icons/086f7e97d657358203916dbe84f61c2bccaa81eb/flags/4x3/{code}.svg"
 
-PLAYABLE = [
-    "GB", "IE", "IS", "NO", "SE", "FI", "DK", "NL", "BE", "FR", "ES", "PT", "DE",
-    "CH", "AT", "IT", "PL", "CZ", "HU", "RO", "BG", "GR", "HR", "UA", "RS",
-    "EE", "LV", "LT", "SK", "SI", "BA",
-    "AL", "MK", "ME", "MD", "LU", "XK",
-]
+# "frame" (minx, miny, maxx, maxy in source coordinates, 900 x ~441) keeps only the
+# parts of playable countries whose centre lies inside it, dropping far-away pieces
+# (French Guiana, Svalbard, ...). "exclude" boxes drop pieces inside the frame.
+REGIONS = {
+    "europa": {
+        "playable": [
+            "GB", "IE", "IS", "NO", "SE", "FI", "DK", "NL", "BE", "FR", "ES", "PT", "DE",
+            "CH", "AT", "IT", "PL", "CZ", "HU", "RO", "BG", "GR", "HR", "UA", "RS",
+            "EE", "LV", "LT", "SK", "SI", "BA",
+            "AL", "MK", "ME", "MD", "LU", "XK",
+        ],
+        "frame": (340, 50, 560, 210),
+    },
+    "noord-amerika": {
+        "playable": [
+            "CA", "US", "MX", "GT", "BZ", "SV", "HN", "NI", "CR", "PA",
+            "CU", "JM", "HT", "DO", "BS", "TT",
+        ],
+        "frame": (0, 0, 300, 270),
+        "exclude": [(0, 200, 100, 260)],  # Hawaii
+    },
+    "zuid-amerika": {
+        "playable": ["CO", "VE", "GY", "SR", "EC", "PE", "BR", "BO", "PY", "UY", "AR", "CL"],
+        "frame": (200, 245, 345, 445),
+    },
+}
 
 # The source uses placeholder keys (_0, _1, ...) for some territories.
 CODE_BY_NAME = {"Kosovo": "XK", "N. Cyprus": "CY-N", "Somaliland": "SO-S"}
@@ -38,11 +59,15 @@ NAMES = {
     "SK": "Slowakije", "SI": "Slovenië", "BA": "Bosnië en Herzegovina",
     "AL": "Albanië", "MK": "Noord-Macedonië", "ME": "Montenegro",
     "MD": "Moldavië", "LU": "Luxemburg", "XK": "Kosovo",
+    "CA": "Canada", "US": "Verenigde Staten", "MX": "Mexico", "GT": "Guatemala",
+    "BZ": "Belize", "SV": "El Salvador", "HN": "Honduras", "NI": "Nicaragua",
+    "CR": "Costa Rica", "PA": "Panama", "CU": "Cuba", "JM": "Jamaica",
+    "HT": "Haïti", "DO": "Dominicaanse Republiek", "BS": "Bahama's",
+    "TT": "Trinidad en Tobago",
+    "CO": "Colombia", "VE": "Venezuela", "GY": "Guyana", "SR": "Suriname",
+    "EC": "Ecuador", "PE": "Peru", "BR": "Brazilië", "BO": "Bolivia",
+    "PY": "Paraguay", "UY": "Uruguay", "AR": "Argentinië", "CL": "Chili",
 }
-
-# Map-coordinate frame (source space is 900 x ~441) used to drop far-away
-# overseas parts (e.g. French Guiana, Svalbard) from playable countries.
-EUROPE_FRAME = (340, 50, 560, 210)  # minx, miny, maxx, maxy
 
 PAD = 0.04
 
@@ -93,10 +118,13 @@ def area_centroid(pts):
     return abs(a), (cx / (6 * a), cy / (6 * a))
 
 
-def in_frame(pt):
+def inside(pt, box):
     x, y = pt
-    fx0, fy0, fx1, fy1 = EUROPE_FRAME
-    return fx0 <= x <= fx1 and fy0 <= y <= fy1
+    return box[0] <= x <= box[2] and box[1] <= y <= box[3]
+
+
+def keep_part(pt, region):
+    return inside(pt, region["frame"]) and not any(inside(pt, b) for b in region.get("exclude", []))
 
 
 def overlaps(b, v):
@@ -105,18 +133,28 @@ def overlaps(b, v):
 
 def main():
     world = load_source()
-    missing = [c for c in PLAYABLE if c not in world]
+    all_codes = []
+    for key, region in REGIONS.items():
+        print(f"== {key}")
+        build_region(world, key, region)
+        all_codes += region["playable"]
+    fetch_flags(all_codes)
+
+
+def build_region(world, key, region):
+    codes = region["playable"]
+    missing = [c for c in codes if c not in world]
     if missing:
         raise SystemExit(f"Codes not in source: {missing}")
 
     playable = []
     all_pts = []
-    for code in PLAYABLE:
+    for code in codes:
         subs = parse_subpaths(world[code]["d"])
         kept = []
         for chunk, pts in subs:
             _, c = area_centroid(pts)
-            if in_frame(c):
+            if keep_part(c, region):
                 kept.append((chunk, pts))
             else:
                 print(f"  dropped outlying part of {code} at {c[0]:.0f},{c[1]:.0f}")
@@ -125,7 +163,7 @@ def main():
         pts = [p for _, ps in kept for p in ps]
         b = bbox(pts)
         all_pts.extend(pts)
-        print(f"{code} {world[code]['name']:<16} bbox {b[0]:.0f},{b[1]:.0f} - {b[2]:.0f},{b[3]:.0f}")
+        print(f"{code} {world[code]['name']:<22} bbox {b[0]:.0f},{b[1]:.0f} - {b[2]:.0f},{b[3]:.0f}")
         playable.append({
             "code": code,
             "name": NAMES.get(code, world[code]["name"]),
@@ -141,7 +179,7 @@ def main():
 
     context = []
     for code, entry in world.items():
-        if code in PLAYABLE:
+        if code in codes:
             continue
         subs = [(ch, pts) for ch, pts in parse_subpaths(entry["d"]) if overlaps(bbox(pts), view)]
         if subs:
@@ -157,9 +195,10 @@ def main():
         "// Map path data from jsvectormap (https://github.com/themustafaomar/jsvectormap),\n"
         "// Copyright (c) 2020 Mustafa Omar, MIT License. See THIRD_PARTY_NOTICES.md.\n"
     )
-    OUT.write_text(header + "export default " + json.dumps(data, separators=(",", ":"), ensure_ascii=False) + ";\n", encoding="utf-8")
-    print(f"\nviewBox {data['viewBox']}; {len(playable)} playable, {len(context)} context -> {OUT}")
-    fetch_flags(PLAYABLE)
+    out = DATA_DIR / f"{key}.js"
+    body = json.dumps(data, separators=(",", ":"), ensure_ascii=False)
+    out.write_text(header + "export default " + body + ";\n", encoding="utf-8")
+    print(f"viewBox {data['viewBox']}; {len(playable)} playable, {len(context)} context -> {out}\n")
 
 
 def fetch_flags(codes):

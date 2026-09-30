@@ -2,7 +2,7 @@ export const flagUrl = (code) => `flags/${code.toLowerCase()}.svg`;
 
 export function createFlagView(img) {
   const frame = img.parentElement;
-  let preloaded = false;
+  const preloaded = new Set();
 
   function show(country) {
     frame.classList.remove('correct');
@@ -14,9 +14,11 @@ export function createFlagView(img) {
   }
 
   function preloadAll(countries) {
-    if (preloaded) return;
-    preloaded = true;
-    for (const c of countries) new Image().src = flagUrl(c.code);
+    for (const c of countries) {
+      if (preloaded.has(c.code)) continue;
+      preloaded.add(c.code);
+      new Image().src = flagUrl(c.code);
+    }
   }
 
   return { show, markCorrect, preloadAll };

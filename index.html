@@ -8,14 +8,14 @@
   <meta name="apple-mobile-web-app-title" content="KORILIO">
   <meta name="theme-color" content="#bfe3f5">
   <title>KORILIO – Kaart en vlaggen</title>
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/style.css?v=3">
 </head>
-<body data-screen="menu">
+<body data-screen="menu" data-mode="">
   <div class="app">
     <header class="bar">
-      <button class="icon-btn game-only" id="home" type="button" aria-label="Menu">🏠</button>
+      <button class="icon-btn" id="home" type="button" aria-label="Menu">🏠</button>
       <h1 class="logo">KORILIO</h1>
-      <div class="progress game-only" id="progress" aria-live="polite"></div>
+      <div class="progress" id="progress" aria-live="polite"></div>
       <button class="icon-btn" id="sound-toggle" type="button" aria-label="Geluid aan">🔊</button>
     </header>
 
@@ -37,15 +37,20 @@
       </div>
     </section>
 
+    <section class="menu" id="regions">
+      <h2 class="menu-title" id="regions-title">Kies een werelddeel</h2>
+      <div class="menu-cards region-cards" id="region-cards"></div>
+    </section>
+
     <main class="stage">
       <div class="view map-wrap">
-        <svg id="map" class="map-svg" role="img" aria-label="Kaart van Europa waarop één land oplicht"
+        <svg id="map" class="map-svg" role="img" aria-label="Kaart waarop één land oplicht"
              preserveAspectRatio="xMidYMid meet"></svg>
       </div>
 
       <div class="view flag-wrap">
         <div class="flag-frame">
-          <img id="flag" alt="Vlag van een Europees land" draggable="false">
+          <img id="flag" alt="Vlag van een land" draggable="false">
         </div>
       </div>
 
@@ -72,6 +77,6 @@
 
   <div class="error-box" id="error-box" hidden></div>
 
-  <script type="module" src="js/main.js"></script>
+  <script type="module" src="js/main.js?v=3"></script>
 </body>
 </html>
