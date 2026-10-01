@@ -1,8 +1,8 @@
-import { REGIONS } from './regions.js';
+import { REGIONS } from './regions.js?v=6';
 import { createGame } from './game.js';
-import { createMap } from './map.js';
+import { createMap } from './map.js?v=6';
 import { createFlagView, flagUrl } from './flags.js';
-import { createUI, createSound } from './ui.js?v=5';
+import { createUI, createSound } from './ui.js?v=6';
 
 const ADVANCE_MS = 1400;
 const SVG_NS = 'http://www.w3.org/2000/svg';

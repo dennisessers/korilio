@@ -1,6 +1,6 @@
 # KORILIO
 
-A geography game for kids, entirely in Dutch, with two games, each for three regions: Europa (37 countries), Noord- en Midden-Amerika (16) and Zuid-Amerika (12).
+A geography game for kids, entirely in Dutch, with two games, each for six regions: Europa (38 countries), Noord- en Midden-Amerika (16), Zuid-Amerika (12), Afrika (50), West- en Centraal-Azië (22) and Zuid- en Oost-Azië (23).
 
 - **Kaart** (map): a country lights up on the map of the chosen region, and the player taps its name from four big buttons.
 - **Vlaggen** (flags): a flag is shown, and the player taps the matching country name from four big buttons.

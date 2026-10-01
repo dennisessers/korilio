@@ -1,5 +1,6 @@
 const SVG_NS = 'http://www.w3.org/2000/svg';
 const TINY_PX = 14;
+const TINY_AREA_PX = 150;
 
 function el(name, attrs = {}) {
   const node = document.createElementNS(SVG_NS, name);
@@ -52,7 +53,8 @@ export function createMap(svg, data) {
     );
     // Countries like Luxembourg or Trinidad are only a few pixels wide on screen; add a dot.
     const box = p.getBoundingClientRect();
-    tinyTarget = Math.max(box.width, box.height) < TINY_PX ? country : null;
+    const tiny = Math.max(box.width, box.height) < TINY_PX || box.width * box.height < TINY_AREA_PX;
+    tinyTarget = tiny ? country : null;
     if (tinyTarget) {
       markerLayer.append(
         el('circle', { class: 'dot', cx: country.cx, cy: country.cy, r: ringRadius * 0.3 }),

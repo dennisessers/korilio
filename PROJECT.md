@@ -1,9 +1,9 @@
 # KORILIO: map and flag quiz for kids
 
-A geography game with two modules, chosen on an opening screen, each playable for three regions (65 countries in total):
+A geography game with two modules, chosen on an opening screen, each playable for six regions (161 countries in total):
 - **Kaart** (map): a country lights up on the map, and the child taps its name from four big buttons.
 - **Vlaggen** (flags): a flag is shown, and the child taps the country name from four big buttons.
-- **Regions:** Europa (37), Noord- en Midden-Amerika (16) and Zuid-Amerika (12). The child picks one after choosing Kaart or Vlaggen.
+- **Regions:** Europa (38), Noord- en Midden-Amerika (16), Zuid-Amerika (12), Afrika (50), West- en Centraal-Azië (22) and Zuid- en Oost-Azië (23). The child picks one after choosing Kaart or Vlaggen.
 
 Everything is in Dutch, built for touch on an iPad, with no timer and no penalties.
 
@@ -11,13 +11,13 @@ Everything is in Dutch, built for touch on an iPad, with no timer and no penalti
 - **Code:** https://github.com/dennisessers/korilio (public, because GitHub Pages needs that)
 - **Idea:** @DennisEssers. Built with Claude Code.
 
-## State of affairs (2026-09-26)
+## State of affairs (2026-10-02)
 
 **Live and working** at https://dennisessers.github.io/korilio/, with everything committed and pushed in both repos (`korilio` and the umbrella `claude_tryouts`).
 
 **What's there:**
 - An opening menu, "Kies een spel" (choose a game), with two cards: **Kaart** and **Vlaggen**.
-- Then a region screen, "Kaart: kies een werelddeel" (choose a continent), with three cards: **Europa**, **Noord- en Midden-Amerika** and **Zuid-Amerika**.
+- Then a region screen, "Kaart: kies een werelddeel" (choose a continent), with six cards in a grid (3 × 2 in landscape, 2 × 3 in portrait): **Europa**, **Noord- en Midden-Amerika**, **Zuid-Amerika**, **Afrika**, **West- en Centraal-Azië** and **Zuid- en Oost-Azië**.
   - The cards show a mini map of the region in the Kaart game, and 4 flags in the Vlaggen game.
 - **Kaart:** the countries of the chosen region light up on that region's map. The kid picks the Dutch name from 4 buttons (all 4 from the same region).
 - **Vlaggen:** the flags of the same countries, with the same 4-button question.
@@ -35,9 +35,16 @@ Everything is in Dutch, built for touch on an iPad, with no timer and no penalti
 - The user plays the map game on a real iPad.
 - **Sound on the iPad works** (confirmed by the user, 2026-10-01) since the switch to `<audio>` elements. Before that the iPad stayed silent; see *Sound*.
 - The Americas regions: all four combinations (Kaart/Vlaggen × North/South) played through in Chrome. Europe still works after switching maps.
+- Afrika and both Asia regions (2026-10-02), in Chrome:
+  - all 12 region × module combinations start with a valid first round;
+  - all 161 flags load;
+  - every country name fits on a button, upright and sideways (at most 2 lines);
+  - the region screen fits without scrolling.
+
+  Full play-throughs were only possible for part of Afrika, because Chrome throttles timers in the background test tab (see *Testing locally*).
 
 **Not done yet / open:**
-- The **flag game and the Americas haven't been checked on a real iPad yet** (tested in Chrome only).
+- **Not yet checked on a real iPad:** the flag game, the Americas, Afrika and Asia (tested in Chrome only).
 - **Git layout:** KORILIO's git data still sits in `KORILIO/.git` instead of `.git/modules/` (see *Repo and git workflow*). It works; tidying it is optional.
 - **URL capitals:** the URL is case-sensitive; a redirect for `/KORILIO/` was offered but not built.
 - **Difficulty levels, hints, reverse mode:** not built (see *Ideas for later*).
@@ -59,6 +66,8 @@ Everything is in Dutch, built for touch on an iPad, with no timer and no penalti
 | `cc2b7f4` | This PROJECT.md |
 | `3b62af0` | Second module **Vlaggen** plus an opening menu with the choice "Kaart" / "Vlaggen", hash navigation, 🏠 button, "Menu" on the end screen |
 | `1808bb4` | Regions: Noord- en Midden-Amerika (16) and Zuid-Amerika (12) added next to Europa, a region screen after choosing Kaart/Vlaggen, `data/europe.js` renamed to `data/europa.js`, extractor builds all regions, tiny-country dot now based on on-screen size |
+| `8a3c3aa` … `a4f63b9` | Sound on iPad: Web Audio workarounds, then `geluidstest.html`, then the switch to `<audio>` elements with generated sound files |
+| *(commit "Add Afrika…")* | Afrika (50), West- en Centraal-Azië (22), Zuid- en Oost-Azië (23) and Cyprus in Europa. Region screen as a 3 × 2 / 2 × 3 grid. Tiny-country dot also for thin countries (area < 150 px²). Version numbers on all changed imports, including the data files |
 | `ac64e41` + this commit | PROJECT.md brought up to date with the current state |
 
 ## Repo and git workflow
@@ -82,9 +91,9 @@ Everything is in Dutch, built for touch on an iPad, with no timer and no penalti
 | `js/map.js` | `createMap(svg, data)` draws the layers and provides `highlight`, `markCorrect`, `flashGuess` and `clear` |
 | `js/flags.js` | `createFlagView(img)`: `show(country)`, `markCorrect()` (green frame), `preloadAll(countries)`; `flagUrl(code)` |
 | `js/ui.js` | `createUI()` (buttons, prompt, progress, end screen, `hideSummary`) and `createSound()` (`<audio>` players for applause, wrong-answer tone and ding; `unlock()`, `play(kind)`, `stop()`) |
-| `data/europa.js`, `data/noord-amerika.js`, `data/zuid-amerika.js` | **Generated**, one per region. `{ viewBox, playable:[{code,name,d,cx,cy}], context:[{code,d}] }` |
+| `data/<region>.js` (`europa`, `noord-amerika`, `zuid-amerika`, `afrika`, `west-azie`, `oost-azie`) | **Generated**, one per region (11–31 KB each). `{ viewBox, playable:[{code,name,d,cx,cy}], context:[{code,d}] }` |
 | `tools/extract_map.py` | Generates every `data/<region>.js` from `tools/world.js` (config in `REGIONS`) and downloads any missing `flags/<code>.svg`. Python standard library only |
-| `flags/<code>.svg` | 4×3 flags from flag-icons (commit `086f7e9`), lowercase ISO codes (`xk` = Kosovo). 65 files, 847 KB in total (Europa 383 KB, Noord-Amerika 304 KB, Zuid-Amerika 159 KB). The big ones are flags with detailed coats of arms: Servië 181 KB, Bolivia 103 KB, Mexico 85 KB, Spanje 81 KB, Montenegro 56 KB |
+| `flags/<code>.svg` | 4×3 flags from flag-icons (commit `086f7e9`), lowercase ISO codes (`xk` = Kosovo). 161 files, 1.1 MB in total. Per region: Europa 388 KB, Noord-Amerika 304 KB, Zuid-Amerika 159 KB, Afrika 65 KB, West-Azië 108 KB, Oost-Azië 88 KB. The big ones are flags with detailed coats of arms: Servië 181 KB, Bolivia 103 KB, Mexico 85 KB, Spanje 81 KB, El Salvador 77 KB |
 | `tools/FLAG_ICONS_LICENSE` | MIT licence of flag-icons |
 | `tools/world.js` | Pinned copy of jsvectormap's `world.js` (commit `08283f0`) |
 | `tools/JSVECTORMAP_LICENSE` | MIT licence of jsvectormap |
@@ -107,7 +116,7 @@ Everything is in Dutch, built for touch on an iPad, with no timer and no penalti
 - **URL hash is the source of truth:** `route()` runs on load and on every `hashchange`.
   - The hash is `#<mode>/<region>`. `#kaart/europa` → `startGame('kaart', 'europa')`; `#kaart` alone → `showRegions('kaart')`; anything else → `showMenu()`.
   - The menu cards, region cards and 🏠 only change `location.hash`. So the browser back button (game → region screen → menu), the iPad back swipe, refresh and direct links all work.
-- **Region data:** all three data files are imported at start (about 60 KB together). The game map `<svg id="map">` is rebuilt with `createMap` only when the Kaart game switches to another region; the choices always come from the same region.
+- **Region data:** all six data files are imported at start (about 155 KB together). The game map `<svg id="map">` is rebuilt with `createMap` only when the Kaart game switches to another region; the choices always come from the same region.
 - **Leaving or restarting a game** (`stopGame`) clears the pending next-round timer, stops the applause and closes the end screen, so nothing from the old game fires later.
 - **`MODES`** holds, per module: the question (`prompt`) plus `show(country)`, `wrong(code)` and `correct(code)`.
   - **Kaart:** `map.highlight` / `map.flashGuess` / `map.markCorrect`.
@@ -145,8 +154,15 @@ The SVG layers, drawn bottom to top:
 3. `g.context`: grey countries that are never asked about (Russia, Belarus, Turkey, North Africa, …).
 4. `g.playable`: the quiz countries (cream), each with `data-code`.
 5. `g.markers`: a pulsing ring around the target country.
-   - Countries smaller than 14 px on screen (`TINY_PX` in `map.js`, measured at the moment they light up) also get a solid orange **dot** (`.dot`). It turns green after a correct answer.
-   - On a laptop screen that's Luxemburg in Europe, and Belize, El Salvador, Jamaica, Haïti and Trinidad en Tobago in North America. On a smaller screen (iPad portrait) a few more can qualify, such as Kosovo.
+   - Countries that are small on screen also get a solid orange **dot** (`.dot`). "Small" means less than 14 px on their longest side (`TINY_PX`) or less than 150 px² in area (`TINY_AREA_PX`, for thin countries like Gambia), measured at the moment they light up. The dot turns green after a correct answer.
+   - On a laptop screen, these countries get a dot:
+     - Europa: Luxemburg, Cyprus.
+     - Noord-Amerika: Belize, El Salvador, Jamaica, Haïti, Bahama's, Trinidad en Tobago.
+     - Afrika: Gambia, Djibouti, Equatoriaal-Guinea, Rwanda, Burundi, Eswatini.
+     - West-Azië: Palestina, Qatar.
+     - Oost-Azië: Brunei, Oost-Timor.
+
+     On a smaller screen (iPad portrait) a few more can qualify, such as Kosovo, Libanon or Koeweit.
 
 Borders are white 1px lines with `vector-effect: non-scaling-stroke`, so they look the same at any screen size.
 
@@ -179,12 +195,12 @@ Borders are white 1px lines with `vector-effect: non-scaling-stroke`, so they lo
 - The 🔊/🔇 setting is saved in `localStorage` under `korilio.sound`.
 - **Changing a sound:** edit `tools/make_sounds.py` (clip length, volume, tone frequency), run `python tools/make_sounds.py`, and raise the `?v=` numbers (see *Testing locally*).
 
-## Countries (65 in 3 regions)
+## Countries (161 in 6 regions)
 
 The codes are ISO alpha-2; `XK` is used for Kosovo. The Dutch names come from `NAMES` in `tools/extract_map.py`, the lists per region from `REGIONS` there.
 
-**Europa (37):**
-> GB Verenigd Koninkrijk · IE Ierland · IS IJsland · NO Noorwegen · SE Zweden · FI Finland · DK Denemarken · NL Nederland · BE België · FR Frankrijk · ES Spanje · PT Portugal · DE Duitsland · CH Zwitserland · AT Oostenrijk · IT Italië · PL Polen · CZ Tsjechië · HU Hongarije · RO Roemenië · BG Bulgarije · GR Griekenland · HR Kroatië · UA Oekraïne · RS Servië · EE Estland · LV Letland · LT Litouwen · SK Slowakije · SI Slovenië · BA Bosnië en Herzegovina · AL Albanië · MK Noord-Macedonië · ME Montenegro · MD Moldavië · LU Luxemburg · XK Kosovo
+**Europa (38):**
+> GB Verenigd Koninkrijk · IE Ierland · IS IJsland · NO Noorwegen · SE Zweden · FI Finland · DK Denemarken · NL Nederland · BE België · FR Frankrijk · ES Spanje · PT Portugal · DE Duitsland · CH Zwitserland · AT Oostenrijk · IT Italië · PL Polen · CZ Tsjechië · HU Hongarije · RO Roemenië · BG Bulgarije · GR Griekenland · HR Kroatië · UA Oekraïne · RS Servië · EE Estland · LV Letland · LT Litouwen · SK Slowakije · SI Slovenië · BA Bosnië en Herzegovina · AL Albanië · MK Noord-Macedonië · ME Montenegro · MD Moldavië · LU Luxemburg · XK Kosovo · CY Cyprus
 
 **Noord- en Midden-Amerika (16):**
 > CA Canada · US Verenigde Staten · MX Mexico · GT Guatemala · BZ Belize · SV El Salvador · HN Honduras · NI Nicaragua · CR Costa Rica · PA Panama · CU Cuba · JM Jamaica · HT Haïti · DO Dominicaanse Republiek · BS Bahama's · TT Trinidad en Tobago
@@ -192,16 +208,27 @@ The codes are ISO alpha-2; `XK` is used for Kosovo. The Dutch names come from `N
 **Zuid-Amerika (12):**
 > CO Colombia · VE Venezuela · GY Guyana · SR Suriname · EC Ecuador · PE Peru · BR Brazilië · BO Bolivia · PY Paraguay · UY Uruguay · AR Argentinië · CL Chili
 
-The Americas are split in two because a single map from Canada to Chile would be very tall. Central America and the Caribbean would then be only a few pixels on an iPad.
+**Afrika (50):**
+> MA Marokko · EH Westelijke Sahara · DZ Algerije · TN Tunesië · LY Libië · EG Egypte · MR Mauritanië · ML Mali · NE Niger · TD Tsjaad · SD Soedan · ER Eritrea · SN Senegal · GM Gambia · GW Guinee-Bissau · GN Guinee · SL Sierra Leone · LR Liberia · CI Ivoorkust · BF Burkina Faso · GH Ghana · TG Togo · BJ Benin · NG Nigeria · CM Kameroen · CF Centraal-Afrikaanse Republiek · SS Zuid-Soedan · ET Ethiopië · DJ Djibouti · SO Somalië · GQ Equatoriaal-Guinea · GA Gabon · CG Congo-Brazzaville · CD Congo-Kinshasa · UG Oeganda · KE Kenia · RW Rwanda · BI Burundi · TZ Tanzania · AO Angola · ZM Zambia · MW Malawi · MZ Mozambique · ZW Zimbabwe · MG Madagaskar · NA Namibië · BW Botswana · ZA Zuid-Afrika · SZ Eswatini · LS Lesotho
 
-**Only independent countries are playable** (the user's choice).
+**West- en Centraal-Azië (22):**
+> TR Turkije · SY Syrië · LB Libanon · IL Israël · PS Palestina · JO Jordanië · IQ Irak · IR Iran · SA Saoedi-Arabië · KW Koeweit · QA Qatar · AE Verenigde Arabische Emiraten · OM Oman · YE Jemen · GE Georgië · AM Armenië · AZ Azerbeidzjan · KZ Kazachstan · UZ Oezbekistan · TM Turkmenistan · TJ Tadzjikistan · KG Kirgizië
+
+**Zuid- en Oost-Azië (23):**
+> AF Afghanistan · PK Pakistan · IN India · NP Nepal · BT Bhutan · BD Bangladesh · LK Sri Lanka · CN China · MN Mongolië · KP Noord-Korea · KR Zuid-Korea · JP Japan · TW Taiwan · MM Myanmar · LA Laos · VN Vietnam · TH Thailand · KH Cambodja · MY Maleisië · ID Indonesië · PH Filipijnen · BN Brunei · TL Oost-Timor
+
+The Americas are split in two because a single map from Canada to Chile would be very tall. Central America and the Caribbean would then be only a few pixels on an iPad. Asia is split for the same reason: the Middle East is crowded with small countries. Turkey, Georgia, Armenia, Azerbaijan and Kazakhstan count as Asia here; Turkey's European part (around Istanbul) is part of its shape.
+
+**Mainly independent countries are playable** (the user's choice). Exceptions the user explicitly chose (2026-10-01): **Kosovo**, **Taiwan**, **Palestina** and **Westelijke Sahara**. **Cyprus** is in Europa (an EU member, and it fits inside the Europe map frame).
 - Greenland, Puerto Rico, the Falklands and French Guiana are grey on the map.
 - For the United States, Alaska is included; Hawaii and the Aleutian pieces on the far side of the world map are dropped (`exclude` box and frame in `REGIONS`).
 - The small Caribbean island states (Barbados, Grenada, St. Lucia, St. Vincent, Antigua, St. Kitts, Dominica) are **not in the source data**.
+- **Africa:** Somaliland and Noord-Cyprus are grey. The island states Kaapverdië, Comoren, Mauritius, Seychellen and São Tomé are **not in the source data**.
+- **Asia:** Russia stays grey (the user's choice; it would stretch the map across Siberia). Papua New Guinea (Oceania) is grey. Bahrain, Singapore and the Maldives are **not in the source data**.
 
 **Europe, not playable (grey only):**
 - **Russia:** it would stretch the map across Asia.
-- **Belarus, Turkey, Cyprus:** could be added. Belarus is easy. Turkey and Cyprus would widen or shift the map frame to the south-east.
+- **Belarus:** could be added easily. (Turkey is in West-Azië; Cyprus has been added to Europa.)
 - **Micro-states** (Andorra, Monaco, San Marino, Vatican, Liechtenstein, Malta) are **not in the source data at all**, so they can't be added without other map data.
 
 ### Adding or removing a country
@@ -224,7 +251,7 @@ The Americas are split in two because a single map from Canada to Chile would be
    Add Dutch names for the codes to `NAMES`.
 2. Run the script. It writes `data/<key>.js` and downloads the flags.
 3. In `js/regions.js`: import the data file and add the region with its Dutch name and 4 flags for the card. The region screen picks it up automatically.
-4. Check that the region cards still fit (4 cards in a row in landscape, stacked in portrait), then test both modules and check which countries get a dot.
+4. Check that the region cards still fit (the grid has 3 columns in landscape and 2 in portrait; a 7th region adds a row, so check the height). Then test both modules and check which countries get a dot. Give the new data import in `regions.js` the current `?v=` number.
 
 Source-data gotchas:
 - Some territories have placeholder keys (`_0`, `_1`, `_2`). The script maps them to proper codes through `CODE_BY_NAME`.
@@ -240,7 +267,20 @@ python -m http.server 8765
 Then open http://localhost:8765. ES modules don't work over `file://`, so double-clicking `index.html` won't work.
 - **Go straight to a game:** http://localhost:8765/#kaart/noord-amerika, http://localhost:8765/#vlaggen/europa, etc. `#kaart` alone gives the region screen; without a hash you get the menu.
 - **Test both modules and several regions** after any change to `main.js`, `ui.js` or the CSS: menu → Kaart → region → a few rounds → back → another region → 🏠 → Vlaggen → region → end screen → "Menu".
-- **Cache-busting:** `index.html` loads `css/style.css?v=5` and `js/main.js?v=5`, and `main.js` imports `./ui.js?v=5`. Raise the number after a change to those files, so iPads don't mix old and new files. The other modules have no version and can be cached for up to 10 minutes; give an import a `?v=` too when it changes in a way that matters.
+- **Cache-busting:** the current version is `v=6`.
+  - `index.html` loads `css/style.css?v=6` and `js/main.js?v=6`.
+  - `main.js` imports `./regions.js?v=6`, `./map.js?v=6` and `./ui.js?v=6`.
+  - `regions.js` imports every `../data/<region>.js?v=6`.
+
+  Raise the number (everywhere at once is simplest) after a change, so iPads don't mix old and new files. Modules without a version (`game.js`, `flags.js`) can be cached for up to 10 minutes. Chrome also caches unversioned data files: after regenerating, Europa still showed 37 countries until the version was added.
+- **Background-tab throttling:** the Claude in Chrome tab is usually `hidden`.
+  - The first 5 minutes, timers run about normally; after that Chrome throttles them heavily. A full play-through (which waits 1.4 s per round) then takes far longer than the tool's 45 s limit.
+  - `requestAnimationFrame` never fires in a hidden tab, so don't await it.
+  - A script that times out keeps running in the page. Don't start a second loop on top of it; use a lock, or a fresh tab.
+  - Tips:
+    - Open a fresh tab for each long test.
+    - Play in batches of about 12 rounds.
+    - To switch screens without waiting, run `history.replaceState(null, '', '#kaart/afrika')` followed by `dispatchEvent(new HashChangeEvent('hashchange'))`. That calls `route()` synchronously.
 - **Sound can't be heard in the Chrome test tab:** the tab controlled by Claude in Chrome is usually `hidden` (the window is in the background). Chrome then postpones loading `<audio>` files, so `play()` stays pending. Test the *calls* instead, by wrapping `HTMLMediaElement.prototype.play`/`pause`, and test the real sound on a device (`geluidstest.html` helps).
 - **When the browser tool isn't available:** a headless Edge smoke test still catches JavaScript errors: `msedge --headless=new --virtual-time-budget=4000 --dump-dom "http://localhost:8765/#kaart/europa"`, then check that `body` has `data-screen="game"`, there are 4 `class="choice"` elements, and the error box is still `hidden`. Sound can only be tested with a real tap.
 - **iPad view:** use Chrome DevTools → device toolbar (iPad, portrait and landscape). Or embed the page in an `<iframe>` of 768×1024.
@@ -271,7 +311,7 @@ Then open http://localhost:8765. ES modules don't work over `file://`, so double
 - **Smaller flags:** optimise the big SVGs (Servië, Spanje, Montenegro) with e.g. SVGO if loading on a slow connection becomes a problem.
 - **Reverse mode:** show a name and the child taps the country on the map (a new entry in `MODES`).
 - **Flag game, harder:** choose distractors with similar-looking flags (e.g. NL/LU, RO/MD, IE/IT).
-- **More regions:** Afrika, Azië, Oceanië (see *Adding a region*). With 4 or more regions the region cards may need a 2×2 grid.
+- **More regions:** Oceanië (Australia, New Zealand, Papua New Guinea, a few Pacific islands; many small island states are missing from the source data). See *Adding a region*. A 7th card adds a row to the region grid.
 - **"Hele wereld" as its own region:** probably only as a flag game; the world map is too small for Central America or Europe's small countries.
 
 ## Picking this back up

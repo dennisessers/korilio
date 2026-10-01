@@ -26,7 +26,7 @@ REGIONS = {
             "GB", "IE", "IS", "NO", "SE", "FI", "DK", "NL", "BE", "FR", "ES", "PT", "DE",
             "CH", "AT", "IT", "PL", "CZ", "HU", "RO", "BG", "GR", "HR", "UA", "RS",
             "EE", "LV", "LT", "SK", "SI", "BA",
-            "AL", "MK", "ME", "MD", "LU", "XK",
+            "AL", "MK", "ME", "MD", "LU", "XK", "CY",
         ],
         "frame": (340, 50, 560, 210),
     },
@@ -41,6 +41,30 @@ REGIONS = {
     "zuid-amerika": {
         "playable": ["CO", "VE", "GY", "SR", "EC", "PE", "BR", "BO", "PY", "UY", "AR", "CL"],
         "frame": (200, 245, 345, 445),
+    },
+    "afrika": {
+        "playable": [
+            "MA", "EH", "DZ", "TN", "LY", "EG", "MR", "ML", "NE", "TD", "SD", "ER",
+            "SN", "GM", "GW", "GN", "SL", "LR", "CI", "BF", "GH", "TG", "BJ", "NG",
+            "CM", "CF", "SS", "ET", "DJ", "SO", "GQ", "GA", "CG", "CD", "UG", "KE",
+            "RW", "BI", "TZ", "AO", "ZM", "MW", "MZ", "ZW", "MG", "NA", "BW", "ZA",
+            "SZ", "LS",
+        ],
+        "frame": (360, 180, 560, 385),
+    },
+    "west-azie": {
+        "playable": [
+            "TR", "SY", "LB", "IL", "PS", "JO", "IQ", "IR", "SA", "KW", "QA", "AE",
+            "OM", "YE", "GE", "AM", "AZ", "KZ", "UZ", "TM", "TJ", "KG",
+        ],
+        "frame": (480, 120, 620, 265),
+    },
+    "oost-azie": {
+        "playable": [
+            "AF", "PK", "IN", "NP", "BT", "BD", "LK", "CN", "MN", "KP", "KR", "JP",
+            "TW", "MM", "LA", "VN", "TH", "KH", "MY", "ID", "PH", "BN", "TL",
+        ],
+        "frame": (570, 120, 800, 320),
     },
 }
 
@@ -67,6 +91,30 @@ NAMES = {
     "CO": "Colombia", "VE": "Venezuela", "GY": "Guyana", "SR": "Suriname",
     "EC": "Ecuador", "PE": "Peru", "BR": "Brazilië", "BO": "Bolivia",
     "PY": "Paraguay", "UY": "Uruguay", "AR": "Argentinië", "CL": "Chili",
+    "CY": "Cyprus",
+    "MA": "Marokko", "EH": "Westelijke Sahara", "DZ": "Algerije", "TN": "Tunesië",
+    "LY": "Libië", "EG": "Egypte", "MR": "Mauritanië", "ML": "Mali", "NE": "Niger",
+    "TD": "Tsjaad", "SD": "Soedan", "ER": "Eritrea", "SN": "Senegal", "GM": "Gambia",
+    "GW": "Guinee-Bissau", "GN": "Guinee", "SL": "Sierra Leone", "LR": "Liberia",
+    "CI": "Ivoorkust", "BF": "Burkina Faso", "GH": "Ghana", "TG": "Togo", "BJ": "Benin",
+    "NG": "Nigeria", "CM": "Kameroen", "CF": "Centraal-Afrikaanse Republiek",
+    "SS": "Zuid-Soedan", "ET": "Ethiopië", "DJ": "Djibouti", "SO": "Somalië",
+    "GQ": "Equatoriaal-Guinea", "GA": "Gabon", "CG": "Congo-Brazzaville",
+    "CD": "Congo-Kinshasa", "UG": "Oeganda", "KE": "Kenia", "RW": "Rwanda",
+    "BI": "Burundi", "TZ": "Tanzania", "AO": "Angola", "ZM": "Zambia", "MW": "Malawi",
+    "MZ": "Mozambique", "ZW": "Zimbabwe", "MG": "Madagaskar", "NA": "Namibië",
+    "BW": "Botswana", "ZA": "Zuid-Afrika", "SZ": "Eswatini", "LS": "Lesotho",
+    "TR": "Turkije", "SY": "Syrië", "LB": "Libanon", "IL": "Israël", "PS": "Palestina",
+    "JO": "Jordanië", "IQ": "Irak", "IR": "Iran", "SA": "Saoedi-Arabië", "KW": "Koeweit",
+    "QA": "Qatar", "AE": "Verenigde Arabische Emiraten", "OM": "Oman", "YE": "Jemen",
+    "GE": "Georgië", "AM": "Armenië", "AZ": "Azerbeidzjan", "KZ": "Kazachstan",
+    "UZ": "Oezbekistan", "TM": "Turkmenistan", "TJ": "Tadzjikistan", "KG": "Kirgizië",
+    "AF": "Afghanistan", "PK": "Pakistan", "IN": "India", "NP": "Nepal", "BT": "Bhutan",
+    "BD": "Bangladesh", "LK": "Sri Lanka", "CN": "China", "MN": "Mongolië",
+    "KP": "Noord-Korea", "KR": "Zuid-Korea", "JP": "Japan", "TW": "Taiwan",
+    "MM": "Myanmar", "LA": "Laos", "VN": "Vietnam", "TH": "Thailand", "KH": "Cambodja",
+    "MY": "Maleisië", "ID": "Indonesië", "PH": "Filipijnen", "BN": "Brunei",
+    "TL": "Oost-Timor",
 }
 
 PAD = 0.04
