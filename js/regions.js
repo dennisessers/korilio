@@ -1,9 +1,9 @@
-import europa from '../data/europa.js?v=6';
-import noordAmerika from '../data/noord-amerika.js?v=6';
-import zuidAmerika from '../data/zuid-amerika.js?v=6';
-import afrika from '../data/afrika.js?v=6';
-import westAzie from '../data/west-azie.js?v=6';
-import oostAzie from '../data/oost-azie.js?v=6';
+import europa from '../data/europa.js?v=7';
+import noordAmerika from '../data/noord-amerika.js?v=7';
+import zuidAmerika from '../data/zuid-amerika.js?v=7';
+import afrika from '../data/afrika.js?v=7';
+import westAzie from '../data/west-azie.js?v=7';
+import oostAzie from '../data/oost-azie.js?v=7';
 
 // Keys are used in the URL hash (#kaart/europa); data comes from tools/extract_map.py.
 export const REGIONS = {

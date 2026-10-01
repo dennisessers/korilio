@@ -1,9 +1,9 @@
 # KORILIO: map and flag quiz for kids
 
-A geography game with two modules, chosen on an opening screen, each playable for six regions (161 countries in total):
+A geography game with two modules, chosen on an opening screen, each playable for six regions (163 countries in total):
 - **Kaart** (map): a country lights up on the map, and the child taps its name from four big buttons.
 - **Vlaggen** (flags): a flag is shown, and the child taps the country name from four big buttons.
-- **Regions:** Europa (38), Noord- en Midden-Amerika (16), Zuid-Amerika (12), Afrika (50), West- en Centraal-Azië (22) and Zuid- en Oost-Azië (23). The child picks one after choosing Kaart or Vlaggen.
+- **Regions:** Europa (40), Noord- en Midden-Amerika (16), Zuid-Amerika (12), Afrika (50), West- en Centraal-Azië (22) and Zuid- en Oost-Azië (23). The child picks one after choosing Kaart or Vlaggen.
 
 Everything is in Dutch, built for touch on an iPad, with no timer and no penalties.
 
@@ -37,7 +37,7 @@ Everything is in Dutch, built for touch on an iPad, with no timer and no penalti
 - The Americas regions: all four combinations (Kaart/Vlaggen × North/South) played through in Chrome. Europe still works after switching maps.
 - Afrika and both Asia regions (2026-10-02), in Chrome:
   - all 12 region × module combinations start with a valid first round;
-  - all 161 flags load;
+  - all 161 flags load (163 since Rusland and Belarus were added);
   - every country name fits on a button, upright and sideways (at most 2 lines);
   - the region screen fits without scrolling.
 
@@ -93,7 +93,7 @@ Everything is in Dutch, built for touch on an iPad, with no timer and no penalti
 | `js/ui.js` | `createUI()` (buttons, prompt, progress, end screen, `hideSummary`) and `createSound()` (`<audio>` players for applause, wrong-answer tone and ding; `unlock()`, `play(kind)`, `stop()`) |
 | `data/<region>.js` (`europa`, `noord-amerika`, `zuid-amerika`, `afrika`, `west-azie`, `oost-azie`) | **Generated**, one per region (11–31 KB each). `{ viewBox, playable:[{code,name,d,cx,cy}], context:[{code,d}] }` |
 | `tools/extract_map.py` | Generates every `data/<region>.js` from `tools/world.js` (config in `REGIONS`) and downloads any missing `flags/<code>.svg`. Python standard library only |
-| `flags/<code>.svg` | 4×3 flags from flag-icons (commit `086f7e9`), lowercase ISO codes (`xk` = Kosovo). 161 files, 1.1 MB in total. Per region: Europa 388 KB, Noord-Amerika 304 KB, Zuid-Amerika 159 KB, Afrika 65 KB, West-Azië 108 KB, Oost-Azië 88 KB. The big ones are flags with detailed coats of arms: Servië 181 KB, Bolivia 103 KB, Mexico 85 KB, Spanje 81 KB, El Salvador 77 KB |
+| `flags/<code>.svg` | 4×3 flags from flag-icons (commit `086f7e9`), lowercase ISO codes (`xk` = Kosovo). 163 files, 1.1 MB in total. Per region: Europa 390 KB, Noord-Amerika 304 KB, Zuid-Amerika 159 KB, Afrika 65 KB, West-Azië 108 KB, Oost-Azië 88 KB. The big ones are flags with detailed coats of arms: Servië 181 KB, Bolivia 103 KB, Mexico 85 KB, Spanje 81 KB, El Salvador 77 KB |
 | `tools/FLAG_ICONS_LICENSE` | MIT licence of flag-icons |
 | `tools/world.js` | Pinned copy of jsvectormap's `world.js` (commit `08283f0`) |
 | `tools/JSVECTORMAP_LICENSE` | MIT licence of jsvectormap |
@@ -132,7 +132,7 @@ Everything is in Dutch, built for touch on an iPad, with no timer and no penalti
 ### Flags (`js/flags.js`)
 
 - `flags/<code>.svg`, a 4:3 flag in `.flag-frame`. The frame is sized with container-query units (`min(100cqw, 133.33cqh)`), so it's always as large as possible without distortion.
-- `preloadAll` loads the flags of the chosen region as soon as its flag game starts (at most 383 KB, for Europe), so there's no flicker between rounds. Flags already loaded are skipped.
+- `preloadAll` loads the flags of the chosen region as soon as its flag game starts (at most 390 KB, for Europe), so there's no flicker between rounds. Flags already loaded are skipped.
 - The `alt` text is deliberately generic ("Vlag van een land"), so it doesn't give the answer away.
 - The menu pictures have `pointer-events: none`. Otherwise a tap on the picture would count as dragging an image, and the button wouldn't respond.
 
@@ -151,7 +151,7 @@ Everything is in Dutch, built for touch on an iPad, with no timer and no penalti
 The SVG layers, drawn bottom to top:
 1. `rect.sea`: the light-blue sea.
 2. `g.base`: every country again, with a thick stroke in its own land colour (`stroke-width: 1.2px` in **map units**, `vector-effect: none`). This fills the narrow gaps between neighbours. The source shapes are simplified separately, so neighbours don't touch exactly, and without this layer the sea shows through (it made Kosovo look like a hole). Don't remove it.
-3. `g.context`: grey countries that are never asked about (Russia, Belarus, Turkey, North Africa, …).
+3. `g.context`: grey countries that are never asked about in this region (in Europe e.g. Turkey, Georgia, North Africa; in the Asia maps e.g. Russia).
 4. `g.playable`: the quiz countries (cream), each with `data-code`.
 5. `g.markers`: a pulsing ring around the target country.
    - Countries that are small on screen also get a solid orange **dot** (`.dot`). "Small" means less than 14 px on their longest side (`TINY_PX`) or less than 150 px² in area (`TINY_AREA_PX`, for thin countries like Gambia), measured at the moment they light up. The dot turns green after a correct answer.
@@ -195,12 +195,12 @@ Borders are white 1px lines with `vector-effect: non-scaling-stroke`, so they lo
 - The 🔊/🔇 setting is saved in `localStorage` under `korilio.sound`.
 - **Changing a sound:** edit `tools/make_sounds.py` (clip length, volume, tone frequency), run `python tools/make_sounds.py`, and raise the `?v=` numbers (see *Testing locally*).
 
-## Countries (161 in 6 regions)
+## Countries (163 in 6 regions)
 
 The codes are ISO alpha-2; `XK` is used for Kosovo. The Dutch names come from `NAMES` in `tools/extract_map.py`, the lists per region from `REGIONS` there.
 
-**Europa (38):**
-> GB Verenigd Koninkrijk · IE Ierland · IS IJsland · NO Noorwegen · SE Zweden · FI Finland · DK Denemarken · NL Nederland · BE België · FR Frankrijk · ES Spanje · PT Portugal · DE Duitsland · CH Zwitserland · AT Oostenrijk · IT Italië · PL Polen · CZ Tsjechië · HU Hongarije · RO Roemenië · BG Bulgarije · GR Griekenland · HR Kroatië · UA Oekraïne · RS Servië · EE Estland · LV Letland · LT Litouwen · SK Slowakije · SI Slovenië · BA Bosnië en Herzegovina · AL Albanië · MK Noord-Macedonië · ME Montenegro · MD Moldavië · LU Luxemburg · XK Kosovo · CY Cyprus
+**Europa (40):**
+> GB Verenigd Koninkrijk · IE Ierland · IS IJsland · NO Noorwegen · SE Zweden · FI Finland · DK Denemarken · NL Nederland · BE België · FR Frankrijk · ES Spanje · PT Portugal · DE Duitsland · CH Zwitserland · AT Oostenrijk · IT Italië · PL Polen · CZ Tsjechië · HU Hongarije · RO Roemenië · BG Bulgarije · GR Griekenland · HR Kroatië · UA Oekraïne · RS Servië · EE Estland · LV Letland · LT Litouwen · SK Slowakije · SI Slovenië · BA Bosnië en Herzegovina · AL Albanië · MK Noord-Macedonië · ME Montenegro · MD Moldavië · LU Luxemburg · XK Kosovo · CY Cyprus · BY Belarus · RU Rusland
 
 **Noord- en Midden-Amerika (16):**
 > CA Canada · US Verenigde Staten · MX Mexico · GT Guatemala · BZ Belize · SV El Salvador · HN Honduras · NI Nicaragua · CR Costa Rica · PA Panama · CU Cuba · JM Jamaica · HT Haïti · DO Dominicaanse Republiek · BS Bahama's · TT Trinidad en Tobago
@@ -224,11 +224,17 @@ The Americas are split in two because a single map from Canada to Chile would be
 - For the United States, Alaska is included; Hawaii and the Aleutian pieces on the far side of the world map are dropped (`exclude` box and frame in `REGIONS`).
 - The small Caribbean island states (Barbados, Grenada, St. Lucia, St. Vincent, Antigua, St. Kitts, Dominica) are **not in the source data**.
 - **Africa:** Somaliland and Noord-Cyprus are grey. The island states Kaapverdië, Comoren, Mauritius, Seychellen and São Tomé are **not in the source data**.
-- **Asia:** Russia stays grey (the user's choice; it would stretch the map across Siberia). Papua New Guinea (Oceania) is grey. Bahrain, Singapore and the Maldives are **not in the source data**.
+- **Asia:** Russia is grey on the Asia maps (the user's choice; it would stretch them across Siberia). It is playable in Europa instead. Papua New Guinea (Oceania) is grey. Bahrain, Singapore and the Maldives are **not in the source data**.
 
-**Europe, not playable (grey only):**
-- **Russia:** it would stretch the map across Asia.
-- **Belarus:** could be added easily. (Turkey is in West-Azië; Cyprus has been added to Europa.)
+**Russia in Europa (a "partial" country):** the user wanted Russia and Belarus in Europa without making the map bigger (2026-10-02).
+- Belarus fits inside the existing map frame.
+- Russia is listed under `partial` in the Europa entry of `REGIONS`:
+  - it doesn't count when the map frame is calculated;
+  - only the parts of its shape that reach into the frame are kept (the European mainland part and Kaliningrad);
+  - its ring is placed in the middle of the visible part (roughly west of Moscow), not at the centre of the whole country, which would be far off the map.
+- When Russia lights up, it fills the right-hand edge of the map. The map frame (`viewBox` `354.29 62.31 173.03 137.08`) is the same as before.
+
+**Europe, not playable (grey only):** Turkey (in West-Azië), Georgia, North Africa.
 - **Micro-states** (Andorra, Monaco, San Marino, Vatican, Liechtenstein, Malta) are **not in the source data at all**, so they can't be added without other map data.
 
 ### Adding or removing a country
@@ -237,6 +243,7 @@ The Americas are split in two because a single map from Canada to Chile would be
 2. Run `python tools/extract_map.py`. This rewrites every `data/<region>.js`, prints each country's bounding box, and downloads the flag to `flags/<code>.svg` if it's missing. Check that flag-icons has the code: https://github.com/lipis/flag-icons/tree/main/flags/4x3
    - The map frame (`viewBox`) is recalculated from all playable countries of that region.
    - Pieces of a country whose centre lies outside the region's `frame`, or inside one of its `exclude` boxes, are dropped (French Guiana and Svalbard for Europe, Hawaii for North America).
+   - A big country that should be playable without enlarging the map goes in the region's `partial` list too (like Russia in Europa); see *Countries*.
 3. Test locally (see below). Check that the country is visible when highlighted, that the flag shows in the flag game, and that the longest name still fits on a button.
 4. Update the country count in `README.md`, then commit and push (in both repos).
 
@@ -267,10 +274,10 @@ python -m http.server 8765
 Then open http://localhost:8765. ES modules don't work over `file://`, so double-clicking `index.html` won't work.
 - **Go straight to a game:** http://localhost:8765/#kaart/noord-amerika, http://localhost:8765/#vlaggen/europa, etc. `#kaart` alone gives the region screen; without a hash you get the menu.
 - **Test both modules and several regions** after any change to `main.js`, `ui.js` or the CSS: menu → Kaart → region → a few rounds → back → another region → 🏠 → Vlaggen → region → end screen → "Menu".
-- **Cache-busting:** the current version is `v=6`.
-  - `index.html` loads `css/style.css?v=6` and `js/main.js?v=6`.
-  - `main.js` imports `./regions.js?v=6`, `./map.js?v=6` and `./ui.js?v=6`.
-  - `regions.js` imports every `../data/<region>.js?v=6`.
+- **Cache-busting:** the current version is `v=7`.
+  - `index.html` loads `css/style.css?v=7` and `js/main.js?v=7`.
+  - `main.js` imports `./regions.js?v=7`, `./map.js?v=7` and `./ui.js?v=7`.
+  - `regions.js` imports every `../data/<region>.js?v=7`.
 
   Raise the number (everywhere at once is simplest) after a change, so iPads don't mix old and new files. Modules without a version (`game.js`, `flags.js`) can be cached for up to 10 minutes. Chrome also caches unversioned data files: after regenerating, Europa still showed 37 countries until the version was added.
 - **Background-tab throttling:** the Claude in Chrome tab is usually `hidden`.

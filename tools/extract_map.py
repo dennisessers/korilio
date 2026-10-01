@@ -26,9 +26,10 @@ REGIONS = {
             "GB", "IE", "IS", "NO", "SE", "FI", "DK", "NL", "BE", "FR", "ES", "PT", "DE",
             "CH", "AT", "IT", "PL", "CZ", "HU", "RO", "BG", "GR", "HR", "UA", "RS",
             "EE", "LV", "LT", "SK", "SI", "BA",
-            "AL", "MK", "ME", "MD", "LU", "XK", "CY",
+            "AL", "MK", "ME", "MD", "LU", "XK", "CY", "BY", "RU",
         ],
         "frame": (340, 50, 560, 210),
+        "partial": ["RU"],
     },
     "noord-amerika": {
         "playable": [
@@ -91,7 +92,7 @@ NAMES = {
     "CO": "Colombia", "VE": "Venezuela", "GY": "Guyana", "SR": "Suriname",
     "EC": "Ecuador", "PE": "Peru", "BR": "Brazilië", "BO": "Bolivia",
     "PY": "Paraguay", "UY": "Uruguay", "AR": "Argentinië", "CL": "Chili",
-    "CY": "Cyprus",
+    "CY": "Cyprus", "BY": "Belarus", "RU": "Rusland",
     "MA": "Marokko", "EH": "Westelijke Sahara", "DZ": "Algerije", "TN": "Tunesië",
     "LY": "Libië", "EG": "Egypte", "MR": "Mauritanië", "ML": "Mali", "NE": "Niger",
     "TD": "Tsjaad", "SD": "Soedan", "ER": "Eritrea", "SN": "Senegal", "GM": "Gambia",
@@ -195,9 +196,12 @@ def build_region(world, key, region):
     if missing:
         raise SystemExit(f"Codes not in source: {missing}")
 
+    partial = region.get("partial", [])
     playable = []
     all_pts = []
     for code in codes:
+        if code in partial:
+            continue
         subs = parse_subpaths(world[code]["d"])
         kept = []
         for chunk, pts in subs:
@@ -224,6 +228,24 @@ def build_region(world, key, region):
     w, h = x1 - x0, y1 - y0
     vb = (x0 - w * PAD, y0 - h * PAD, w * (1 + 2 * PAD), h * (1 + 2 * PAD))
     view = (vb[0], vb[1], vb[0] + vb[2], vb[1] + vb[3])
+
+    # "partial" countries (Russia in Europa) are playable but don't widen the map:
+    # keep the parts that reach into the view and put the ring on the visible part.
+    for code in partial:
+        visible = [(ch, pts) for ch, pts in parse_subpaths(world[code]["d"]) if overlaps(bbox(pts), view)]
+        largest = max(visible, key=lambda s: area_centroid(s[1])[0])
+        b = bbox(largest[1])
+        cx = (max(b[0], view[0]) + min(b[2], view[2])) / 2
+        cy = (max(b[1], view[1]) + min(b[3], view[3])) / 2
+        print(f"{code} {world[code]['name']:<22} partial, {len(visible)} visible parts, ring at {cx:.0f},{cy:.0f}")
+        playable.append({
+            "code": code,
+            "name": NAMES.get(code, world[code]["name"]),
+            "d": "".join(ch for ch, _ in visible),
+            "cx": round(cx, 2),
+            "cy": round(cy, 2),
+        })
+    playable.sort(key=lambda c: codes.index(c["code"]))
 
     context = []
     for code, entry in world.items():
