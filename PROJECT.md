@@ -33,11 +33,11 @@ Everything is in Dutch, built for touch on an iPad, with no timer and no penalti
 - In Chrome, both modules have been played through from start to finish.
 - The layout was checked in landscape and at iPad-portrait size (768×1024).
 - The user plays the map game on a real iPad.
+- **Sound on the iPad works** (confirmed by the user, 2026-10-01) since the switch to `<audio>` elements. Before that the iPad stayed silent; see *Sound*.
 - The Americas regions: all four combinations (Kaart/Vlaggen × North/South) played through in Chrome. Europe still works after switching maps.
 
 **Not done yet / open:**
 - The **flag game and the Americas haven't been checked on a real iPad yet** (tested in Chrome only).
-- **Sound on iPad:** the user reported no sound (2026-10-01). `geluidstest.html` showed that this iPad blocks Web Audio but plays `<audio>` elements, so the game now uses `<audio>` (see *Sound*). Still to be confirmed on the device.
 - **Git layout:** KORILIO's git data still sits in `KORILIO/.git` instead of `.git/modules/` (see *Repo and git workflow*). It works; tidying it is optional.
 - **URL capitals:** the URL is case-sensitive; a redirect for `/KORILIO/` was offered but not built.
 - **Difficulty levels, hints, reverse mode:** not built (see *Ideas for later*).
