@@ -73,14 +73,16 @@ export function createUI() {
   return { renderChoices, markWrong, markCorrect, updateProgress, showSummary, hideSummary };
 }
 
-let audioCtx = null;
 const SOUND_KEY = 'korilio.sound';
 
-// Applause by Sandermotions (CC0), trimmed; see THIRD_PARTY_NOTICES.md.
-const APPLAUSE_URL = 'sounds/applause.wav';
-const CLIPS = {
-  correct: { seconds: 2.2, volume: 0.6 },
-  finish: { seconds: 5.5, volume: 0.9 },
+// iPad Safari blocks Web Audio here but plays <audio>, which can't change volume,
+// so loudness and fades are baked into these files (tools/make_sounds.py).
+// Applause by Sandermotions (CC0); see THIRD_PARTY_NOTICES.md.
+const FILES = {
+  correct: 'sounds/applause-short.wav',
+  finish: 'sounds/applause-long.wav',
+  wrong: 'sounds/wrong.wav',
+  ding: 'sounds/ding.wav',
 };
 
 function readSoundPref() {
@@ -93,15 +95,19 @@ function readSoundPref() {
 
 export function createSound(toggleBtn) {
   let enabled = readSoundPref();
-  let playing = null;
-  const raw = fetch(APPLAUSE_URL).then((r) => r.arrayBuffer()).catch(() => null);
-  let decoded = null;
+  let unlocked = false;
+  const players = {};
+  for (const [kind, url] of Object.entries(FILES)) {
+    const audio = new Audio(url);
+    audio.preload = 'auto';
+    players[kind] = audio;
+  }
 
   function stopApplause() {
-    try {
-      playing?.stop();
-    } catch {}
-    playing = null;
+    for (const kind of ['correct', 'finish']) {
+      // A muted player is still being unlocked; pausing it now would abort that.
+      if (!players[kind].muted) players[kind].pause();
+    }
   }
 
   function render() {
@@ -113,7 +119,7 @@ export function createSound(toggleBtn) {
     enabled = !enabled;
     if (enabled) {
       unlock();
-      tone(880, 0.3, 0.15);
+      play('ding');
     } else {
       stopApplause();
     }
@@ -124,75 +130,37 @@ export function createSound(toggleBtn) {
   });
   render();
 
-  function load() {
-    decoded ??= raw
-      .then((buf) => buf && new Promise((ok, fail) => audioCtx.decodeAudioData(buf.slice(0), ok, fail)))
-      .catch(() => null)
-      .then((buffer) => {
-        if (!buffer) decoded = null;
-        return buffer;
-      });
-    return decoded;
-  }
-
-  // Must run inside a tap handler: iOS only starts audio from a user gesture.
+  // Must run inside a tap: iOS only lets an <audio> element play later (e.g. the
+  // end-of-game applause from a timer) once it has been started from a gesture.
   function unlock() {
-    if (!audioCtx) {
-      const Ctx = window.AudioContext || window.webkitAudioContext;
-      if (!Ctx) return;
-      // iPadOS 16.4+: play like media, so silent mode doesn't mute the game.
-      if (navigator.audioSession) navigator.audioSession.type = 'playback';
-      audioCtx = new Ctx();
-      // Older iOS only unlocks after a buffer has actually been started in the gesture.
-      const silent = audioCtx.createBufferSource();
-      silent.buffer = audioCtx.createBuffer(1, 1, 22050);
-      silent.connect(audioCtx.destination);
-      silent.start(0);
-      load();
+    if (unlocked) return;
+    unlocked = true;
+    for (const audio of Object.values(players)) {
+      audio.muted = true;
+      const started = audio.play();
+      // play() below unmutes a player it really wants, so leave that one running.
+      const reset = () => {
+        if (!audio.muted) return;
+        audio.pause();
+        audio.currentTime = 0;
+        audio.muted = false;
+      };
+      const failed = (e) => {
+        audio.muted = false;
+        if (e?.name === 'NotAllowedError') unlocked = false;
+      };
+      if (started?.then) started.then(reset, failed);
+      else reset();
     }
-    // iOS uses "interrupted" after an app switch, screen lock or call.
-    if (audioCtx.state !== 'running') audioCtx.resume();
-  }
-
-  async function applause(kind) {
-    const buffer = await load();
-    if (!buffer || !enabled) return;
-    stopApplause();
-    const src = audioCtx.createBufferSource();
-    const g = audioCtx.createGain();
-    src.buffer = buffer;
-    const t = audioCtx.currentTime;
-    const { seconds, volume } = CLIPS[kind];
-    const len = Math.min(seconds, buffer.duration);
-    g.gain.setValueAtTime(0, t);
-    g.gain.linearRampToValueAtTime(volume, t + 0.05);
-    g.gain.setValueAtTime(volume, t + len - 0.7);
-    g.gain.linearRampToValueAtTime(0, t + len);
-    src.connect(g).connect(audioCtx.destination);
-    src.start(t);
-    src.stop(t + len);
-    playing = src;
-  }
-
-  function tone(freq, duration, gain) {
-    if (!audioCtx) return;
-    const osc = audioCtx.createOscillator();
-    const g = audioCtx.createGain();
-    osc.type = 'triangle';
-    osc.frequency.value = freq;
-    const t = audioCtx.currentTime;
-    g.gain.setValueAtTime(0.0001, t);
-    g.gain.exponentialRampToValueAtTime(gain, t + 0.02);
-    g.gain.exponentialRampToValueAtTime(0.0001, t + duration);
-    osc.connect(g).connect(audioCtx.destination);
-    osc.start(t);
-    osc.stop(t + duration + 0.05);
   }
 
   function play(kind) {
-    if (!enabled || !audioCtx) return;
-    if (kind === 'wrong') tone(220, 0.25, 0.12);
-    else applause(kind);
+    if (!enabled) return;
+    if (kind === 'correct' || kind === 'finish') stopApplause();
+    const audio = players[kind];
+    audio.muted = false;
+    audio.currentTime = 0;
+    audio.play()?.catch(() => {});
   }
 
   return { unlock, play, stop: stopApplause };

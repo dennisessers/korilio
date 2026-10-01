@@ -37,7 +37,7 @@ SOFTWARE.
 
 ## Applause sound
 
-`sounds/applause.wav` is a trimmed (5.5 s), mono, 24 kHz version of
+`sounds/applause.wav` (and `applause-short.wav` / `applause-long.wav`, made from it by `tools/make_sounds.py` with volume and fades applied) is a trimmed (5.5 s), mono, 24 kHz version of
 [277021 sandermotions applause-2.wav](https://commons.wikimedia.org/wiki/File:277021_sandermotions_applause-2.wav)
 by **Sandermotions**, released under [CC0](https://creativecommons.org/publicdomain/zero/1.0/) (no attribution required).
 

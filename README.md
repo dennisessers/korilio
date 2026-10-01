@@ -14,7 +14,7 @@ Full project documentation (history, architecture, how to add countries, workflo
 - All countries of the chosen region come up once, in random order, before the game ends. The four answer choices always come from the same region.
 - A wrong answer greys out that button; in the map game it also marks where the guessed country really is. The player then simply tries again, and there is no timer.
 - ⭐ counts countries found on the first try. 🔥 shows a streak of 3 or more.
-- A correct answer gets a short, soft applause, and finishing the game gets a longer one. 🔊/🔇 turns the sound on or off. The setting is remembered. The iPad's silent switch also mutes it.
+- A correct answer gets a short, soft applause, and finishing the game gets a longer one. 🔊/🔇 turns the sound on or off. The setting is remembered. Switching sound on plays a short ding, as a quick check. If there's no sound on a device, open `geluidstest.html` to see which sound technique works there.
 - 🏠 goes back to the opening screen. The end screen offers *Nog een keer* (play again) and *Menu*.
 
 ## Run locally
