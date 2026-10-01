@@ -67,7 +67,7 @@ Everything is in Dutch, built for touch on an iPad, with no timer and no penalti
 | `3b62af0` | Second module **Vlaggen** plus an opening menu with the choice "Kaart" / "Vlaggen", hash navigation, 🏠 button, "Menu" on the end screen |
 | `1808bb4` | Regions: Noord- en Midden-Amerika (16) and Zuid-Amerika (12) added next to Europa, a region screen after choosing Kaart/Vlaggen, `data/europe.js` renamed to `data/europa.js`, extractor builds all regions, tiny-country dot now based on on-screen size |
 | `8a3c3aa` … `a4f63b9` | Sound on iPad: Web Audio workarounds, then `geluidstest.html`, then the switch to `<audio>` elements with generated sound files |
-| *(commit "Add Afrika…")* | Afrika (50), West- en Centraal-Azië (22), Zuid- en Oost-Azië (23) and Cyprus in Europa. Region screen as a 3 × 2 / 2 × 3 grid. Tiny-country dot also for thin countries (area < 150 px²). Version numbers on all changed imports, including the data files |
+| `493dba7` | Afrika (50), West- en Centraal-Azië (22), Zuid- en Oost-Azië (23) and Cyprus in Europa. Region screen as a 3 × 2 / 2 × 3 grid. Tiny-country dot also for thin countries (area < 150 px²). Version numbers on all changed imports, including the data files |
 | `ac64e41` + this commit | PROJECT.md brought up to date with the current state |
 
 ## Repo and git workflow
