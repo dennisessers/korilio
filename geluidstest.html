@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>KORILIO – Geluidstest</title>
+  <style>
+    body { font-family: system-ui, -apple-system, sans-serif; margin: 0; padding: 16px; background: #fff8ec; color: #2b2d42; }
+    h1 { margin: 0 0 12px; color: #4361ee; }
+    button { display: block; width: 100%; max-width: 520px; min-height: 64px; margin: 10px 0; font: inherit; font-size: 1.3rem; font-weight: 700; border-radius: 14px; border: 3px solid #e2d7c3; background: #fff; touch-action: manipulation; }
+    #info, #log { max-width: 520px; background: #fff; border-radius: 12px; padding: 12px; font-size: 0.95rem; white-space: pre-wrap; word-break: break-word; }
+    #log { min-height: 120px; margin-top: 12px; }
+    .ok { color: #1d8a55; } .err { color: #c0392b; }
+  </style>
+</head>
+<body>
+  <h1>Geluidstest</h1>
+  <p>Tik de knoppen één voor één en noteer wat je <b>hoort</b> en wat er onderaan verschijnt.</p>
+  <div id="info"></div>
+  <button id="t1" type="button">1. Piep (Web Audio)</button>
+  <button id="t2" type="button">2. Applaus (Web Audio)</button>
+  <button id="t3" type="button">3. Applaus (HTML-audio)</button>
+  <div id="log"></div>
+
+  <script>
+    var logEl = document.getElementById('log');
+    function log(msg, cls) {
+      var line = document.createElement('div');
+      if (cls) line.className = cls;
+      line.textContent = new Date().toLocaleTimeString() + '  ' + msg;
+      logEl.appendChild(line);
+    }
+    window.addEventListener('error', function (e) { log('JS-fout: ' + e.message, 'err'); });
+    window.addEventListener('unhandledrejection', function (e) { log('Fout: ' + (e.reason && (e.reason.name + ': ' + e.reason.message)), 'err'); });
+
+    var ua = navigator.userAgent;
+    var os = (ua.match(/OS (\d+[_\d]*) like Mac/) || [])[1];
+    var Ctx = window.AudioContext || window.webkitAudioContext;
+    document.getElementById('info').textContent =
+      'Systeem: ' + (os ? 'iOS/iPadOS ' + os.replace(/_/g, '.') : (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1 ? 'iPad (bureaubladmodus, versie onbekend)' : 'onbekend')) +
+      '\nBeginschermapp: ' + (navigator.standalone ? 'ja' : 'nee') +
+      '\nWeb Audio: ' + (Ctx ? 'ja' : 'NEE') +
+      '\naudioSession: ' + (navigator.audioSession ? 'ja (type ' + navigator.audioSession.type + ')' : 'nee') +
+      '\n\n' + ua;
+
+    var ctx = null;
+    function getCtx() {
+      if (!ctx) {
+        if (navigator.audioSession) {
+          try { navigator.audioSession.type = 'playback'; log('audioSession.type = ' + navigator.audioSession.type); }
+          catch (e) { log('audioSession fout: ' + e.message, 'err'); }
+        }
+        ctx = new Ctx();
+        log('AudioContext gemaakt, state = ' + ctx.state + ', sampleRate = ' + ctx.sampleRate);
+        ctx.onstatechange = function () { log('state -> ' + ctx.state); };
+        var s = ctx.createBufferSource();
+        s.buffer = ctx.createBuffer(1, 1, 22050);
+        s.connect(ctx.destination);
+        s.start(0);
+      }
+      if (ctx.state !== 'running') {
+        var p = ctx.resume();
+        if (p && p.then) p.then(function () { log('resume ok, state = ' + ctx.state, 'ok'); }, function (e) { log('resume fout: ' + e.name + ': ' + e.message, 'err'); });
+      }
+      return ctx;
+    }
+
+    document.getElementById('t1').addEventListener('click', function () {
+      var c = getCtx();
+      var osc = c.createOscillator();
+      var g = c.createGain();
+      osc.frequency.value = 880;
+      g.gain.value = 0.3;
+      osc.connect(g);
+      g.connect(c.destination);
+      osc.start();
+      osc.stop(c.currentTime + 0.6);
+      log('Piep gestart (state = ' + c.state + ', currentTime = ' + c.currentTime.toFixed(2) + ')');
+    });
+
+    document.getElementById('t2').addEventListener('click', function () {
+      var c = getCtx();
+      log('WAV laden...');
+      fetch('sounds/applause.wav').then(function (r) {
+        log('Download: HTTP ' + r.status);
+        return r.arrayBuffer();
+      }).then(function (buf) {
+        log('Bestand: ' + buf.byteLength + ' bytes, decoderen...');
+        return new Promise(function (ok, fail) { c.decodeAudioData(buf, ok, fail); });
+      }).then(function (audio) {
+        log('Gedecodeerd: ' + audio.duration.toFixed(1) + ' s, state = ' + c.state, 'ok');
+        var src = c.createBufferSource();
+        src.buffer = audio;
+        src.connect(c.destination);
+        src.start();
+        src.stop(c.currentTime + 2.5);
+        log('Applaus gestart');
+      }).catch(function (e) {
+        log('Fout: ' + (e && (e.name + ': ' + e.message)), 'err');
+      });
+    });
+
+    document.getElementById('t3').addEventListener('click', function () {
+      var a = new Audio('sounds/applause.wav');
+      var p = a.play();
+      log('HTML-audio play() aangeroepen');
+      if (p && p.then) p.then(function () { log('HTML-audio speelt', 'ok'); setTimeout(function () { a.pause(); }, 2500); },
+        function (e) { log('HTML-audio fout: ' + e.name + ': ' + e.message, 'err'); });
+    });
+  </script>
+</body>
+</html>
